@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sattva — AI Student Mental Wellness Companion</title>
+    
+    <!-- Meta tags for SEO & Hackathon Presentation -->
+    <meta name="description" content="Sattva is an empathetic, AI-powered mental wellness companion helping students manage exam stress, track moods, analyze journaling, and practice mindfulness.">
+    <meta name="keywords" content="student wellness, exam stress, board exams, NEET prep, JEE prep, AI companion, mood tracker, journaling, mindfulness">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Ambient background blobs -->
+    <div class="blob-bg blob-1"></div>
+    <div class="blob-bg blob-2"></div>
+
+    <!-- Main App Layout Grid -->
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 15a5 5 0 1 1 5-5 5 5 0 0 1-5 5z"/>
+                        <path class="glow-ring" d="M12 2a10 10 0 1 0 10 10" />
+                    </svg>
+                </div>
+                <h1 class="logo-text">Sattva</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-tab="dashboard" id="btn-dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-btn" data-tab="journal" id="btn-journal">
+                    <i data-lucide="book-open"></i>
+                    <span>AI Journal</span>
+                </button>
+                <button class="nav-btn" data-tab="chat" id="btn-chat">
+                    <i data-lucide="message-circle"></i>
+                    <span>Aura Bot</span>
+                </button>
+                <button class="nav-btn" data-tab="mindfulness" id="btn-mindfulness">
+                    <i data-lucide="heart"></i>
+                    <span>Calm Room</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="settings-btn" id="btn-open-settings">
+                    <i data-lucide="key-round"></i>
+                    <span>Gemini API Key</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Global Top Bar -->
+            <header class="top-bar">
+                <div class="welcome-section">
+                    <h2 class="welcome-title" id="greeting-text">Hello, Warrior</h2>
+                    <p class="quote-text" id="daily-quote">"Your focus determines your reality." — Star Wars</p>
+                </div>
+                <div class="header-actions">
+                    <div class="streak-counter card-glow-teal">
+                        <i data-lucide="flame" class="streak-icon"></i>
+                        <span class="streak-value" id="streak-count">1 Day Streak</span>
+                    </div>
+                    
+                    <button class="header-action-btn panic-btn-glow" id="btn-sos-panic" title="Panic Button (Instant SOS Calm)">
+                        <i data-lucide="shield-alert"></i>
+                    </button>
+                    
+                    <button class="header-action-btn" id="btn-toggle-theme" title="Toggle Light/Dark Theme">
+                        <i data-lucide="moon"></i>
+                    </button>
+                    
+                    <div class="user-header-badge" title="User Profile Details">
+                        <div class="avatar-sm">
+                            <i data-lucide="user"></i>
+                        </div>
+                        <span class="user-header-name">Exam Warrior</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Inner Views -->
+            <div class="view-viewport">
+                
+                <!-- 1. DASHBOARD VIEW -->
+                <section class="view-panel active" id="view-dashboard">
+                    <div class="dashboard-grid">
+                        
+                        <!-- Top Summary Cards -->
+                        <div class="card stat-card card-glow-purple">
+                            <div class="card-icon"><i data-lucide="smile"></i></div>
+                            <div class="stat-info">
+                                <h3>Today's Mood</h3>
+                                <p class="stat-value" id="dash-mood-val">Not Logged</p>
+                            </div>
+                        </div>
+                        <div class="card stat-card card-glow-blue">
+                            <div class="card-icon"><i data-lucide="activity"></i></div>
+                            <div class="stat-info">
+                                <h3>Stress Index</h3>
+                                <p class="stat-value" id="dash-stress-val">--</p>
+                            </div>
+                        </div>
+                        <div class="card stat-card card-glow-teal">
+                            <div class="card-icon"><i data-lucide="sparkles"></i></div>
+                            <div class="stat-info">
+                                <h3>Mindfulness Streak</h3>
+                                <p class="stat-value" id="dash-mindful-val">0 Sessions</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Left Panel: Chart & Analysis -->
+                        <div class="card chart-card large-card">
+                            <div class="card-header">
+                                <h3 class="card-title">Mood & Stress History</h3>
+                                <span class="card-subtitle">Last 7 journal entries</span>
+                            </div>
+                            <div class="chart-container" id="mood-chart-wrapper">
+                                <!-- Dynamic SVG Line Chart will render here -->
+                                <svg id="mood-chart" viewBox="0 0 600 220" width="100%" height="100%"></svg>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Trigger Alerts & Coping Strategy -->
+                        <div class="card triggers-card">
+                            <h3 class="card-title">Stress Triggers Detected</h3>
+                            <p class="card-subtitle">Hidden emotional patterns from your journals</p>
+                            <div class="triggers-list" id="dash-triggers-list">
+                                <p class="empty-state">No triggers detected yet. Write a journal entry to analyze stress.</p>
+                            </div>
+                        </div>
+
+                        <div class="card advice-card large-card">
+                            <div class="advice-header">
+                                <i data-lucide="brain-circuit" class="advice-icon"></i>
+                                <div>
+                                    <h3 class="card-title">Adaptive Coping Plan</h3>
+                                    <p class="card-subtitle">AI-powered wellness tips based on recent logs</p>
+                                </div>
+                            </div>
+                            <div class="advice-content" id="dash-coping-content">
+                                <p class="empty-state">Write or update your journal. Aura will formulate a custom wellness coping plan for your specific stressors here.</p>
+                            </div>
+                        </div>
+
+                        <!-- Daily Self-Care Checklist Card -->
+                        <div class="card self-care-card">
+                            <div class="self-care-header">
+                                <h3 class="card-title">Daily Self-Care Check-In</h3>
+                                <p class="card-subtitle">Healthy habits boost exam performance</p>
+                            </div>
+                            
+                            <div class="self-care-progress-container">
+                                <div class="self-care-progress-bar">
+                                    <div class="self-care-progress-fill" id="self-care-progress-bar-fill" style="width: 0%;"></div>
+                                </div>
+                                <span class="self-care-progress-text" id="self-care-progress-txt">0/5 Complete</span>
+                            </div>
+                            
+                            <div class="self-care-list">
+                                <label class="self-care-item">
+                                    <input type="checkbox" class="self-care-cb" data-task="water">
+                                    <span class="custom-cb-box"></span>
+                                    <div class="self-care-item-info">
+                                        <span class="self-care-item-title">💧 Stay Hydrated</span>
+                                        <span class="self-care-item-desc">Drink at least 2L of water today</span>
+                                    </div>
+                                </label>
+                                <label class="self-care-item">
+                                    <input type="checkbox" class="self-care-cb" data-task="sleep">
+                                    <span class="custom-cb-box"></span>
+                                    <div class="self-care-item-info">
+                                        <span class="self-care-item-title">😴 Healthy Rest</span>
+                                        <span class="self-care-item-desc">Get 7-8 hours of sleep tonight</span>
+                                    </div>
+                                </label>
+                                <label class="self-care-item">
+                                    <input type="checkbox" class="self-care-cb" data-task="walk">
+                                    <span class="custom-cb-box"></span>
+                                    <div class="self-care-item-info">
+                                        <span class="self-care-item-title">🚶‍♂️ Active Break</span>
+                                        <span class="self-care-item-desc">Take a 15-minute walk or stretch</span>
+                                    </div>
+                                </label>
+                                <label class="self-care-item">
+                                    <input type="checkbox" class="self-care-cb" data-task="detox">
+                                    <span class="custom-cb-box"></span>
+                                    <div class="self-care-item-info">
+                                        <span class="self-care-item-title">📵 Digital Detox</span>
+                                        <span class="self-care-item-desc">No screens 30m before sleep</span>
+                                    </div>
+                                </label>
+                                <label class="self-care-item" id="label-task-breathing">
+                                    <input type="checkbox" class="self-care-cb" data-task="breathing" id="cb-task-breathing" disabled>
+                                    <span class="custom-cb-box disabled-cb"></span>
+                                    <div class="self-care-item-info">
+                                        <span class="self-care-item-title">🧘 Mindful Breath</span>
+                                        <span class="self-care-item-desc">Complete a session in Calm Room</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </section>
+
+                <!-- 2. AI JOURNAL VIEW -->
+                <section class="view-panel" id="view-journal">
+                    <div class="journal-layout">
+                        <!-- Left Column: Input Form -->
+                        <div class="card journal-input-card">
+                            <h3 class="card-title">Daily Journal & Stress Analyzer</h3>
+                            <p class="card-subtitle">Share your study struggles, exam fears, mock test feelings, or general anxiety. Sattva uses Gemini to look deeper.</p>
+                            
+                            <form id="journal-form">
+                                <div class="form-group">
+                                    <label class="form-label">How are you feeling right now?</label>
+                                    <div class="mood-selector" id="mood-selector-buttons">
+                                        <button type="button" class="mood-btn" data-mood="Happy" title="Happy">😊<span>Happy</span></button>
+                                        <button type="button" class="mood-btn" data-mood="Calm" title="Calm">😌<span>Calm</span></button>
+                                        <button type="button" class="mood-btn" data-mood="Anxious" title="Anxious">😰<span>Anxious</span></button>
+                                        <button type="button" class="mood-btn" data-mood="Sad" title="Sad">😢<span>Sad</span></button>
+                                        <button type="button" class="mood-btn" data-mood="Tired" title="Tired">🥱<span>Tired</span></button>
+                                        <button type="button" class="mood-btn" data-mood="Stressed" title="Stressed">🤯<span>Stressed</span></button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="journal-text" class="form-label">Write your thoughts</label>
+                                    <textarea id="journal-text" class="journal-textarea" placeholder="Today was tough. I spent 8 hours studying biology but mock test scores aren't improving. I feel like I'll disappoint everyone..." required></textarea>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn" id="btn-analyze-journal">
+                                    <i data-lucide="sparkles"></i>
+                                    <span>Analyze with Sattva AI</span>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Right Column: Analysis Results -->
+                        <div class="card journal-results-card" id="journal-results-panel">
+                            <!-- Empty State -->
+                            <div class="results-empty-state" id="results-empty">
+                                <i data-lucide="heart-handshake" class="empty-icon"></i>
+                                <h4>Ready for Deep Emotional Analysis</h4>
+                                <p>Type your journal entries on the left, select your current mood, and let Sattva AI highlight hidden stress patterns, trigger scores, and offer immediate coping exercises.</p>
+                            </div>
+                            
+                            <!-- Loading State -->
+                            <div class="results-loading-state hidden" id="results-loading">
+                                <div class="sattva-pulse-loader"></div>
+                                <p>Sattva is analyzing your words empathetically...</p>
+                            </div>
+                            
+                            <!-- Content State -->
+                            <div class="results-content hidden" id="results-content">
+                                <div class="results-header">
+                                    <div class="results-meta">
+                                        <span class="badge badge-mood" id="res-mood-tag">Anxious</span>
+                                        <span class="badge badge-stress" id="res-stress-tag">Stress Index: 75/100</span>
+                                    </div>
+                                    <h4 class="results-title">Sattva's Analysis</h4>
+                                </div>
+                                
+                                <div class="results-body">
+                                    <div class="res-section">
+                                        <h5 class="res-sec-title"><i data-lucide="search-code"></i> Emotional Analysis</h5>
+                                        <p id="res-analysis">Analyzing stress patterns...</p>
+                                    </div>
+                                    
+                                    <div class="res-section">
+                                        <h5 class="res-sec-title"><i data-lucide="zap"></i> Stress Triggers</h5>
+                                        <div class="trigger-chips-container" id="res-triggers">
+                                            <!-- Dynamic Trigger Tags -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="res-section">
+                                        <h5 class="res-sec-title"><i data-lucide="heart"></i> Real-time Coping Strategy</h5>
+                                        <p id="res-coping">Tailored steps for coping with this stressor will appear here.</p>
+                                    </div>
+                                    
+                                    <div class="res-section">
+                                        <h5 class="res-sec-title"><i data-lucide="wind"></i> Suggested Mindfulness Exercise</h5>
+                                        <div class="mindful-recommendation-card" id="btn-go-to-breathing">
+                                            <div class="rec-icon"><i data-lucide="timer"></i></div>
+                                            <div class="rec-info">
+                                                <p class="rec-name" id="res-mindful-name">4-7-8 Relaxing Breath</p>
+                                                <p class="rec-desc">Tap to start this exercise in the Calm Room.</p>
+                                            </div>
+                                            <i data-lucide="chevron-right" class="rec-arrow"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. AI CHAT COMPANION VIEW -->
+                <section class="view-panel" id="view-chat">
+                    <div class="chat-layout">
+                        <!-- Chat Main Window -->
+                        <div class="card chat-window">
+                            <div class="chat-header">
+                                <div class="chat-companion-avatar">
+                                    <i data-lucide="bot"></i>
+                                    <span class="online-indicator"></span>
+                                </div>
+                                <div class="chat-companion-details">
+                                    <h4>Sattva Empathetic Companion</h4>
+                                    <p>Safe, supportive space — feel free to vent anything</p>
+                                </div>
+                                <button class="clear-chat-btn" id="btn-clear-chat" title="Clear Chat">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="chat-messages" id="chat-messages-container">
+                                <!-- Default Welcome Message -->
+                                <div class="message companion">
+                                    <div class="msg-bubble">
+                                        Hi there! I'm Sattva, your wellness companion. Preparing for exams can feel incredibly overwhelming, exhausting, and stressful. I am here to listen, support, and help you find calm. What's on your mind today?
+                                    </div>
+                                    <span class="msg-time">Just now</span>
+                                </div>
+                            </div>
+                            
+                            <div class="chat-suggestions" id="chat-suggestions-wrapper">
+                                <button class="suggest-chip" data-text="I feel overwhelmed by my competitive exam prep.">I feel overwhelmed</button>
+                                <button class="suggest-chip" data-text="I can't focus on studying today, my mind is racing.">Can't focus today</button>
+                                <button class="suggest-chip" data-text="Give me a quick 2-minute motivation boost.">Quick motivation</button>
+                                <button class="suggest-chip" data-text="I got a bad score in my mock test and feel like giving up.">Bad mock score</button>
+                            </div>
+                            
+                            <form class="chat-input-area" id="chat-form">
+                                <input type="text" id="chat-input-text" class="chat-input" placeholder="Type what is bothering you..." autocomplete="off" required>
+                                <button type="submit" class="chat-send-btn" id="btn-send-chat">
+                                    <i data-lucide="send"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. MINDFULNESS & CALM ROOM VIEW -->
+                <section class="view-panel" id="view-mindfulness">
+                    <div class="mindfulness-layout">
+                        
+                        <!-- Left Column -->
+                        <div class="mindfulness-column">
+                            <!-- Breathing Box -->
+                            <div class="card breathing-card">
+                                <h3 class="card-title">Guided Breathing & De-stressing</h3>
+                                <p class="card-subtitle">Sync your breathing to lower cortisol, calm your nervous system, and clear exam anxiety.</p>
+                                
+                                <div class="breathing-session-control">
+                                    <div class="form-group">
+                                        <label class="form-label" style="text-align: center;">Breathing Technique</label>
+                                        <select class="breath-select" id="breathing-pattern-select">
+                                            <option value="4-7-8">4-7-8 Relaxing Breath (Deep Calming)</option>
+                                            <option value="4-4">4-4-4-4 Box Breathing (Focus & Control)</option>
+                                            <option value="5-5">5-5 Resonance Breathing (Stress Relief)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="breathing-container">
+                                    <!-- The visual breathing circle expander -->
+                                    <div class="breathing-circle-outer" id="breathing-circle-trigger" title="Click circle to Start/Stop session">
+                                        <div class="breathing-ring-spinner"></div>
+                                        <div class="breathing-circle-inner" id="breathing-bubble"></div>
+                                        <div class="breathing-status" id="breathing-status-text">Inhale</div>
+                                        <div class="breathing-timer" id="breathing-timer-count">--</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="breathing-buttons">
+                                    <button class="control-btn play-btn" id="btn-breathing-control">
+                                        <i data-lucide="play"></i>
+                                        <span>Start Guided Session</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Zen Pomodoro Card -->
+                            <div class="card pomodoro-card card-glow-purple">
+                                <div class="pomodoro-header">
+                                    <div class="pomodoro-icon"><i data-lucide="timer"></i></div>
+                                    <div>
+                                        <h3 class="card-title">Zen Pomodoro Focus</h3>
+                                        <p class="card-subtitle">Focus study blocks & forced breathing resets</p>
+                                    </div>
+                                </div>
+
+                                <div class="pomodoro-timer-container">
+                                    <div class="pomodoro-timer-ring">
+                                        <div class="pomodoro-time-display" id="pomodoro-timer-txt">25:00</div>
+                                        <div class="pomodoro-phase-badge" id="pomodoro-status-badge">Focus Session</div>
+                                    </div>
+                                </div>
+
+                                <div class="pomodoro-controls">
+                                    <button class="pomodoro-btn main-btn" id="btn-pomodoro-toggle" title="Start/Pause Focus">
+                                        <i data-lucide="play"></i> <span id="btn-pomodoro-text">Start Focus</span>
+                                    </button>
+                                    <button class="pomodoro-btn secondary" id="btn-pomodoro-reset" title="Reset Timer">
+                                        <i data-lucide="rotate-ccw"></i>
+                                    </button>
+                                </div>
+
+                                <div class="pomodoro-presets">
+                                    <button class="preset-btn active" data-minutes="25" data-phase="focus">Study 25m</button>
+                                    <button class="preset-btn" data-minutes="5" data-phase="short-break">Chill 5m</button>
+                                    <button class="preset-btn" data-minutes="15" data-phase="long-break">Rest 15m</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="mindfulness-column">
+                            <!-- Sound Machine Card -->
+                            <div class="card sounds-card">
+                                <h3 class="card-title">Calming Soundscapes</h3>
+                                <p class="card-subtitle">Play soothing, simulated sound waves to block distractions or aid sleep.</p>
+                                
+                                <div class="sounds-grid">
+                                    <div class="sound-item" data-sound="rain">
+                                        <div class="sound-icon"><i data-lucide="cloud-rain"></i></div>
+                                        <span class="sound-name">Deep Rain</span>
+                                        <button class="sound-toggle"><i data-lucide="play"></i></button>
+                                    </div>
+                                    <div class="sound-item" data-sound="forest">
+                                        <div class="sound-icon"><i data-lucide="trees"></i></div>
+                                        <span class="sound-name">Autumn Forest</span>
+                                        <button class="sound-toggle"><i data-lucide="play"></i></button>
+                                    </div>
+                                    <div class="sound-item" data-sound="waves">
+                                        <div class="sound-icon"><i data-lucide="waves"></i></div>
+                                        <span class="sound-name">Ocean Waves</span>
+                                        <button class="sound-toggle"><i data-lucide="play"></i></button>
+                                    </div>
+                                    <div class="sound-item" data-sound="lofi">
+                                        <div class="sound-icon"><i data-lucide="music"></i></div>
+                                        <span class="sound-name">Study Lofi Beats</span>
+                                        <button class="sound-toggle"><i data-lucide="play"></i></button>
+                                    </div>
+                                </div>
+                                
+                                <div class="sound-visualizer hidden" id="sound-viz">
+                                    <span>Playing soothing soundwave...</span>
+                                    <div class="viz-bars">
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Zen Stress-Buster Game Trigger Card -->
+                            <div class="card stress-buster-card card-glow-teal">
+                                <div class="stress-buster-content">
+                                    <div class="stress-buster-icon-box"><i data-lucide="sparkles"></i></div>
+                                    <div class="stress-buster-info">
+                                        <h3 class="card-title">Stress-Buster Game</h3>
+                                        <p class="card-subtitle">Dissolve exam worries in a relaxing bubble-popping sandbox.</p>
+                                    </div>
+                                </div>
+                                <button class="stress-buster-play-btn" id="btn-open-stress-game">
+                                    <i data-lucide="gamepad-2"></i> <span>Open Stress-Buster</span>
+                                </button>
+                            </div>
+
+                            <!-- Affirmations Card -->
+                            <div class="card affirmations-card">
+                                <div class="affirmation-decor"><i data-lucide="quote"></i></div>
+                                <h3 class="card-title">Daily Positive Affirmations</h3>
+                                <p class="affirmation-body" id="affirmation-display">
+                                    "My worth is not defined by an exam score. I am smart, capable, and doing my best."
+                                </p>
+                                <button class="new-affirmation-btn" id="btn-next-affirmation">
+                                    <i data-lucide="refresh-cw"></i> Next Affirmation
+                                </button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- SETTINGS MODAL (Gemini API Configuration) -->
+    <div class="modal-backdrop hidden" id="settings-modal">
+        <div class="modal card">
+            <div class="modal-header">
+                <h3>Configure Sattva AI Assistant</h3>
+                <button class="close-modal-btn" id="btn-close-settings">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <p class="modal-desc">
+                    Sattva uses the official <strong>Google Gemini API</strong> to analyze your journaling patterns and talk with you empathetically. Your API key remains stored securely inside your local browser.
+                </p>
+                
+                <div class="form-group">
+                    <label for="api-key-input" class="form-label">Gemini API Key</label>
+                    <div class="api-input-wrapper">
+                        <input type="password" id="api-key-input" class="modal-input" placeholder="AIzaSy...">
+                        <button type="button" class="toggle-password-btn" id="btn-toggle-key-visibility">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </div>
+                    <span class="help-text">
+                        Don't have an API key? You can get a free developer key at <a href="https://aistudio.google.com/" target="_blank" rel="noopener">Google AI Studio</a>.
+                    </span>
+                </div>
+                
+                <div class="key-status-indicator" id="key-status">
+                    <i data-lucide="alert-circle" class="status-icon info"></i>
+                    <span id="key-status-text">No Gemini API key stored yet. Demo prompts will run locally.</span>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="secondary-btn" id="btn-cancel-settings">Cancel</button>
+                <button class="primary-btn" id="btn-save-settings">Save API Key</button>
+            </div>
+        </div>
+    </div>
+    <!-- SOS PANIC OVERLAY SCREEN -->
+    <div class="sos-overlay hidden" id="sos-panel">
+        <div class="sos-container">
+            <div class="sos-header">
+                <button class="close-sos-btn" id="btn-close-sos">
+                    <i data-lucide="heart"></i>
+                    <span>I feel calm now</span>
+                </button>
+            </div>
+            
+            <div class="sos-body">
+                <h2 class="sos-title">Calm Down, Warrior</h2>
+                <p class="sos-subtitle" id="sos-calm-message">Let's slow things down together. Take a breath.</p>
+                
+                <div class="sos-breathing-sphere-outer">
+                    <div class="sos-breathing-sphere-inner" id="sos-breathing-bubble"></div>
+                    <div class="sos-breathing-status" id="sos-breathing-status">Inhale</div>
+                    <div class="sos-breathing-timer" id="sos-breathing-timer">5s</div>
+                </div>
+                
+                <div class="sos-ambient-info">
+                    <div class="sound-visualizer" style="border-color: rgba(20, 184, 166, 0.25); background: rgba(20, 184, 166, 0.05); color: var(--accent-teal);">
+                        <span>Playing synthesized ocean waves...</span>
+                        <div class="viz-bars">
+                            <div class="bar" style="background-color: var(--accent-teal);"></div>
+                            <div class="bar" style="background-color: var(--accent-teal);"></div>
+                            <div class="bar" style="background-color: var(--accent-teal);"></div>
+                            <div class="bar" style="background-color: var(--accent-teal);"></div>
+                            <div class="bar" style="background-color: var(--accent-teal);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ZEN BUBBLE POP MODAL -->
+    <div class="modal-backdrop hidden" id="game-modal">
+        <div class="modal card game-modal-content">
+            <div class="modal-header">
+                <h3>Zen Bubble Pop Stress-Buster</h3>
+                <button class="close-modal-btn" id="btn-close-game">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body game-modal-body">
+                <p class="modal-desc" style="text-align: center; margin-bottom: 15px;">
+                    Tap floating bubbles to pop them and dissolve your academic stressors.
+                </p>
+                <div class="game-score-bar">
+                    <span id="game-popped-count">0/8 Popped</span>
+                    <button class="game-reset-btn" id="btn-reset-game">
+                        <i data-lucide="refresh-cw"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="game-sandbox" id="game-sandbox">
+                    <!-- Floating bubbles will be created dynamically here -->
+                    <div class="game-celebration-message hidden" id="game-celebration">
+                        <i data-lucide="award" class="celebration-icon"></i>
+                        <h4>Mind Cleared!</h4>
+                        <p>All academic stressors popped and dissolved. Take a slow deep breath.</p>
+                        <button class="primary-btn" id="btn-play-again-game" style="margin-top: 15px;">Play Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Audio Simulated Sounds Elements -->
+    <audio id="ambient-audio" loop></audio>
+
+    <!-- Application Script -->
+    <script src="gemini-api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
