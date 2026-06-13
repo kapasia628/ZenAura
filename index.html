@@ -17,8 +17,8 @@
     <!-- CSS Stylesheet -->
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Lucide Icons CDN (Pinned JSDelivr for ultra-fast cached loading) -->
-    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+    <!-- Lucide Icons CDN (Pinned JSDelivr for ultra-fast deferred loading) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
     <!-- Ambient background blobs -->
@@ -40,7 +40,7 @@
                 <h1 class="logo-text">ZenAura</h1>
             </div>
             
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" aria-label="Sidebar Navigation">
                 <button class="nav-btn active" data-tab="dashboard" id="btn-dashboard">
                     <i data-lucide="layout-dashboard"></i>
                     <span>Dashboard</span>
@@ -89,7 +89,7 @@
                         <span class="streak-value" id="streak-count">1 Day Streak</span>
                     </div>
                     
-                    <button class="header-action-btn panic-btn-glow" id="btn-sos-panic" title="Panic Button (Instant SOS Calm)">
+                    <button class="header-action-btn panic-btn-glow" id="btn-sos-panic" title="Panic Button (Instant SOS Calm)" aria-label="Panic Button (Instant SOS Calm)">
                         <i data-lucide="shield-alert"></i>
                     </button>
                     
@@ -100,7 +100,7 @@
                         <button type="button" class="preset-color-dot" data-theme="sunset" style="background-color: #e11d48;" aria-label="Rose Accent Theme" title="Sunset Glow"></button>
                     </div>
 
-                    <button class="header-action-btn" id="btn-toggle-theme" title="Toggle Light/Dark Theme">
+                    <button class="header-action-btn" id="btn-toggle-theme" title="Toggle Light/Dark Theme" aria-label="Toggle Light/Dark Theme">
                         <i data-lucide="moon"></i>
                     </button>
                     
@@ -190,42 +190,41 @@
                                 </div>
                                 <span class="self-care-progress-text" id="self-care-progress-txt">0/5 Complete</span>
                             </div>
-                            
-                            <div class="self-care-list">
-                                <label class="self-care-item">
-                                    <input type="checkbox" class="self-care-cb" data-task="water">
+                                                      <div class="self-care-list">
+                                <label class="self-care-item" for="cb-task-water">
+                                    <input type="checkbox" class="self-care-cb" data-task="water" id="cb-task-water" aria-label="Hydration task completed">
                                     <span class="custom-cb-box"></span>
                                     <div class="self-care-item-info">
                                         <span class="self-care-item-title">💧 Stay Hydrated</span>
                                         <span class="self-care-item-desc">Drink at least 2L of water today</span>
                                     </div>
                                 </label>
-                                <label class="self-care-item">
-                                    <input type="checkbox" class="self-care-cb" data-task="sleep">
+                                <label class="self-care-item" for="cb-task-sleep">
+                                    <input type="checkbox" class="self-care-cb" data-task="sleep" id="cb-task-sleep" aria-label="Rest task completed">
                                     <span class="custom-cb-box"></span>
                                     <div class="self-care-item-info">
                                         <span class="self-care-item-title">😴 Healthy Rest</span>
                                         <span class="self-care-item-desc">Get 7-8 hours of sleep tonight</span>
                                     </div>
                                 </label>
-                                <label class="self-care-item">
-                                    <input type="checkbox" class="self-care-cb" data-task="walk">
+                                <label class="self-care-item" for="cb-task-walk">
+                                    <input type="checkbox" class="self-care-cb" data-task="walk" id="cb-task-walk" aria-label="Active break task completed">
                                     <span class="custom-cb-box"></span>
                                     <div class="self-care-item-info">
                                         <span class="self-care-item-title">🚶‍♂️ Active Break</span>
                                         <span class="self-care-item-desc">Take a 15-minute walk or stretch</span>
                                     </div>
                                 </label>
-                                <label class="self-care-item">
-                                    <input type="checkbox" class="self-care-cb" data-task="detox">
+                                <label class="self-care-item" for="cb-task-detox">
+                                    <input type="checkbox" class="self-care-cb" data-task="detox" id="cb-task-detox" aria-label="Digital detox task completed">
                                     <span class="custom-cb-box"></span>
                                     <div class="self-care-item-info">
                                         <span class="self-care-item-title">📵 Digital Detox</span>
                                         <span class="self-care-item-desc">No screens 30m before sleep</span>
                                     </div>
                                 </label>
-                                <label class="self-care-item" id="label-task-breathing">
-                                    <input type="checkbox" class="self-care-cb" data-task="breathing" id="cb-task-breathing" disabled>
+                                <label class="self-care-item" id="label-task-breathing" for="cb-task-breathing">
+                                    <input type="checkbox" class="self-care-cb" data-task="breathing" id="cb-task-breathing" disabled aria-label="Mindful breathing task completed">
                                     <span class="custom-cb-box disabled-cb"></span>
                                     <div class="self-care-item-info">
                                         <span class="self-care-item-title">🧘 Mindful Breath</span>
@@ -350,9 +349,9 @@
                                     <h4>ZenAura Empathetic Companion</h4>
                                     <p>Safe, supportive space — feel free to vent anything</p>
                                 </div>
-                                <button class="clear-chat-btn" id="btn-clear-chat" title="Clear Chat">
-                                    <i data-lucide="trash-2"></i>
-                                </button>
+                                <button class="clear-chat-btn" id="btn-clear-chat" title="Clear Chat" aria-label="Clear chat history">
+                                     <i data-lucide="trash-2"></i>
+                                 </button>
                             </div>
                             
                             <div class="chat-messages" id="chat-messages-container">
@@ -373,11 +372,11 @@
                             </div>
                             
                             <form class="chat-input-area" id="chat-form">
-                                <input type="text" id="chat-input-text" class="chat-input" placeholder="Type what is bothering you..." autocomplete="off" required>
-                                <button type="submit" class="chat-send-btn" id="btn-send-chat">
-                                    <i data-lucide="send"></i>
-                                </button>
-                            </form>
+                                 <input type="text" id="chat-input-text" class="chat-input" placeholder="Type what is bothering you..." autocomplete="off" required aria-label="Type message to ZenAura companion">
+                                 <button type="submit" class="chat-send-btn" id="btn-send-chat" aria-label="Send message">
+                                     <i data-lucide="send"></i>
+                                 </button>
+                             </form>
                         </div>
                     </div>
                 </section>
@@ -395,8 +394,8 @@
                                 
                                 <div class="breathing-session-control">
                                     <div class="form-group">
-                                        <label class="form-label" style="text-align: center;">Breathing Technique</label>
-                                        <select class="breath-select" id="breathing-pattern-select">
+                                         <label for="breathing-pattern-select" class="form-label" style="text-align: center;">Breathing Technique</label>
+                                         <select class="breath-select" id="breathing-pattern-select">
                                             <option value="4-7-8">4-7-8 Relaxing Breath (Deep Calming)</option>
                                             <option value="4-4">4-4-4-4 Box Breathing (Focus & Control)</option>
                                             <option value="5-5">5-5 Resonance Breathing (Stress Relief)</option>
@@ -440,12 +439,12 @@
                                 </div>
 
                                 <div class="pomodoro-controls">
-                                    <button class="pomodoro-btn main-btn" id="btn-pomodoro-toggle" title="Start/Pause Focus">
-                                        <i data-lucide="play"></i> <span id="btn-pomodoro-text">Start Focus</span>
-                                    </button>
-                                    <button class="pomodoro-btn secondary" id="btn-pomodoro-reset" title="Reset Timer">
-                                        <i data-lucide="rotate-ccw"></i>
-                                    </button>
+                                     <button class="pomodoro-btn main-btn" id="btn-pomodoro-toggle" title="Start/Pause Focus" aria-label="Start Focus Session">
+                                         <i data-lucide="play"></i> <span id="btn-pomodoro-text">Start Focus</span>
+                                     </button>
+                                     <button class="pomodoro-btn secondary" id="btn-pomodoro-reset" title="Reset Timer" aria-label="Reset Pomodoro Timer">
+                                         <i data-lucide="rotate-ccw"></i>
+                                     </button>
                                 </div>
 
                                 <div class="pomodoro-presets">
@@ -464,26 +463,26 @@
                                 <p class="card-subtitle">Play soothing, simulated sound waves to block distractions or aid sleep.</p>
                                 
                                 <div class="sounds-grid">
-                                    <div class="sound-item" data-sound="rain">
-                                        <div class="sound-icon"><i data-lucide="cloud-rain"></i></div>
-                                        <span class="sound-name">Deep Rain</span>
-                                        <button class="sound-toggle"><i data-lucide="play"></i></button>
-                                    </div>
-                                    <div class="sound-item" data-sound="forest">
-                                        <div class="sound-icon"><i data-lucide="trees"></i></div>
-                                        <span class="sound-name">Autumn Forest</span>
-                                        <button class="sound-toggle"><i data-lucide="play"></i></button>
-                                    </div>
-                                    <div class="sound-item" data-sound="waves">
-                                        <div class="sound-icon"><i data-lucide="waves"></i></div>
-                                        <span class="sound-name">Ocean Waves</span>
-                                        <button class="sound-toggle"><i data-lucide="play"></i></button>
-                                    </div>
-                                    <div class="sound-item" data-sound="lofi">
-                                        <div class="sound-icon"><i data-lucide="music"></i></div>
-                                        <span class="sound-name">Study Lofi Beats</span>
-                                        <button class="sound-toggle"><i data-lucide="play"></i></button>
-                                    </div>
+                                     <div class="sound-item" data-sound="rain">
+                                         <div class="sound-icon"><i data-lucide="cloud-rain"></i></div>
+                                         <span class="sound-name">Deep Rain</span>
+                                         <button class="sound-toggle" aria-label="Toggle Deep Rain soundscape"><i data-lucide="play"></i></button>
+                                     </div>
+                                     <div class="sound-item" data-sound="forest">
+                                         <div class="sound-icon"><i data-lucide="trees"></i></div>
+                                         <span class="sound-name">Autumn Forest</span>
+                                         <button class="sound-toggle" aria-label="Toggle Autumn Forest soundscape"><i data-lucide="play"></i></button>
+                                     </div>
+                                     <div class="sound-item" data-sound="waves">
+                                         <div class="sound-icon"><i data-lucide="waves"></i></div>
+                                         <span class="sound-name">Ocean Waves</span>
+                                         <button class="sound-toggle" aria-label="Toggle Ocean Waves soundscape"><i data-lucide="play"></i></button>
+                                     </div>
+                                     <div class="sound-item" data-sound="lofi">
+                                         <div class="sound-icon"><i data-lucide="music"></i></div>
+                                         <span class="sound-name">Study Lofi Beats</span>
+                                         <button class="sound-toggle" aria-label="Toggle Study Lofi Beats soundscape"><i data-lucide="play"></i></button>
+                                     </div>
                                 </div>
                                 
                                 <div class="sound-visualizer hidden" id="sound-viz">
@@ -588,20 +587,20 @@
                                 <div class="tool-section">
                                     <span class="tool-label">Colors:</span>
                                     <div class="doodle-color-picker" id="doodle-colors-list">
-                                        <button type="button" class="color-btn active" data-color="#7c3aed" style="--btn-color: #7c3aed;" title="Purple"></button>
-                                        <button type="button" class="color-btn" data-color="#2563eb" style="--btn-color: #2563eb;" title="Blue"></button>
-                                        <button type="button" class="color-btn" data-color="#0d9488" style="--btn-color: #0d9488;" title="Teal"></button>
-                                        <button type="button" class="color-btn" data-color="#e11d48" style="--btn-color: #e11d48;" title="Rose"></button>
-                                        <button type="button" class="color-btn" data-color="#f59e0b" style="--btn-color: #f59e0b;" title="Amber"></button>
-                                        <button type="button" class="color-btn" data-color="#0f172a" style="--btn-color: #0f172a;" title="Dark"></button>
-                                        <button type="button" class="color-btn" data-color="#ffffff" style="--btn-color: #ffffff; border: 1.5px dashed var(--border-color);" id="btn-eraser" title="Eraser"></button>
+                                        <button type="button" class="color-btn active" data-color="#7c3aed" style="--btn-color: #7c3aed;" title="Purple" aria-label="Draw with Purple color"></button>
+                                        <button type="button" class="color-btn" data-color="#2563eb" style="--btn-color: #2563eb;" title="Blue" aria-label="Draw with Blue color"></button>
+                                        <button type="button" class="color-btn" data-color="#0d9488" style="--btn-color: #0d9488;" title="Teal" aria-label="Draw with Teal color"></button>
+                                        <button type="button" class="color-btn" data-color="#e11d48" style="--btn-color: #e11d48;" title="Rose" aria-label="Draw with Rose color"></button>
+                                        <button type="button" class="color-btn" data-color="#f59e0b" style="--btn-color: #f59e0b;" title="Amber" aria-label="Draw with Amber color"></button>
+                                        <button type="button" class="color-btn" data-color="#0f172a" style="--btn-color: #0f172a;" title="Dark" aria-label="Draw with Dark color"></button>
+                                        <button type="button" class="color-btn" data-color="#ffffff" style="--btn-color: #ffffff; border: 1.5px dashed var(--border-color);" id="btn-eraser" title="Eraser" aria-label="Eraser tool"></button>
                                     </div>
                                 </div>
                                 
                                 <div class="tool-section">
-                                    <span class="tool-label">Size:</span>
-                                    <input type="range" id="doodle-brush-size" class="brush-slider" min="2" max="24" value="6">
-                                </div>
+                                     <span class="tool-label">Size:</span>
+                                     <input type="range" id="doodle-brush-size" class="brush-slider" min="2" max="24" value="6" aria-label="Doodle brush size">
+                                 </div>
                                 
                                 <button type="button" id="btn-clear-doodle" class="secondary-btn flex-center">
                                     <i data-lucide="trash-2"></i> <span>Clear</span>
@@ -686,11 +685,11 @@
     <div class="modal-backdrop hidden" id="settings-modal">
         <div class="modal card">
             <div class="modal-header">
-                <h3>Configure ZenAura AI Assistant</h3>
-                <button class="close-modal-btn" id="btn-close-settings">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
+                 <h3>Configure ZenAura AI Assistant</h3>
+                 <button class="close-modal-btn" id="btn-close-settings" aria-label="Close settings modal">
+                     <i data-lucide="x"></i>
+                 </button>
+             </div>
             
             <div class="modal-body">
                 <p class="modal-desc">
@@ -698,17 +697,17 @@
                 </p>
                 
                 <div class="form-group">
-                    <label for="api-key-input" class="form-label">Gemini API Key</label>
-                    <div class="api-input-wrapper">
-                        <input type="password" id="api-key-input" class="modal-input" placeholder="AIzaSy...">
-                        <button type="button" class="toggle-password-btn" id="btn-toggle-key-visibility">
-                            <i data-lucide="eye"></i>
-                        </button>
-                    </div>
-                    <span class="help-text">
-                        Don't have an API key? You can get a free developer key at <a href="https://aistudio.google.com/" target="_blank" rel="noopener">Google AI Studio</a>.
-                    </span>
-                </div>
+                     <label for="api-key-input" class="form-label">Gemini API Key</label>
+                     <div class="api-input-wrapper">
+                         <input type="password" id="api-key-input" class="modal-input" placeholder="AIzaSy..." aria-label="Gemini API Key">
+                         <button type="button" class="toggle-password-btn" id="btn-toggle-key-visibility" aria-label="Toggle API key visibility">
+                             <i data-lucide="eye"></i>
+                         </button>
+                     </div>
+                     <span class="help-text">
+                         Don't have an API key? You can get a free developer key at <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.
+                     </span>
+                 </div>
                 
                 <div class="key-status-indicator" id="key-status">
                     <i data-lucide="alert-circle" class="status-icon info"></i>
@@ -761,12 +760,12 @@
     <!-- ZEN BUBBLE POP MODAL -->
     <div class="modal-backdrop hidden" id="game-modal">
         <div class="modal card game-modal-content">
-            <div class="modal-header">
-                <h3>Zen Bubble Pop Stress-Buster</h3>
-                <button class="close-modal-btn" id="btn-close-game">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
+             <div class="modal-header">
+                 <h3>Zen Bubble Pop Stress-Buster</h3>
+                 <button class="close-modal-btn" id="btn-close-game" aria-label="Close stress-buster game modal">
+                     <i data-lucide="x"></i>
+                 </button>
+             </div>
             
             <div class="modal-body game-modal-body">
                 <p class="modal-desc" style="text-align: center; margin-bottom: 15px;">

@@ -3,6 +3,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Lucide Icons
     lucide.createIcons();
+
+    // HTML Sanitization helper for XSS prevention (Security)
+    function escapeHTML(str) {
+        if (typeof str !== 'string') return '';
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
     
     // Core State Variables
     let currentMoodSelection = '';
@@ -251,8 +262,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (journals.length === 0) {
             dashMoodVal.textContent = "Not Logged";
             dashStressVal.textContent = "--";
-            dashCopingContent.innerHTML = `<p class="empty-state">Write a journal entry. Aura will analyze it and display your personal stress-coping strategies here.</p>`;
-            dashTriggersList.innerHTML = `<p class="empty-state">No triggers detected yet.</p>`;
+            
+            const pCoping = document.createElement('p');
+            pCoping.className = 'empty-state';
+            pCoping.textContent = "Write a journal entry. Aura will analyze it and display your personal stress-coping strategies here.";
+            dashCopingContent.replaceChildren(pCoping);
+            
+            const pTrig = document.createElement('p');
+            pTrig.className = 'empty-state';
+            pTrig.textContent = "No triggers detected yet.";
+            dashTriggersList.replaceChildren(pTrig);
+            
             drawMoodChart([]);
             return;
         }
@@ -282,29 +302,61 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Populate Triggers List
         if (latest.triggers && latest.triggers.length > 0) {
-            dashTriggersList.innerHTML = latest.triggers.map(trig => `
-                <div class="trigger-item">
-                    <span class="trigger-name">${trig}</span>
-                    <span class="trigger-badge">Trigger</span>
-                </div>
-            `).join('');
+            dashTriggersList.replaceChildren();
+            latest.triggers.forEach(trig => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'trigger-item';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'trigger-name';
+                nameSpan.textContent = trig;
+                
+                const badgeSpan = document.createElement('span');
+                badgeSpan.className = 'trigger-badge';
+                badgeSpan.textContent = 'Trigger';
+                
+                itemDiv.appendChild(nameSpan);
+                itemDiv.appendChild(badgeSpan);
+                dashTriggersList.appendChild(itemDiv);
+            });
         } else {
-            dashTriggersList.innerHTML = `<p class="empty-state">No major stress triggers detected in latest entry.</p>`;
+            const p = document.createElement('p');
+            p.className = 'empty-state';
+            p.textContent = "No major stress triggers detected in latest entry.";
+            dashTriggersList.replaceChildren(p);
         }
         
         // Populate Coping Plan
         if (latest.copingStrategy) {
-            let copingHTML = '';
+            dashCopingContent.replaceChildren();
             if (Array.isArray(latest.copingStrategy)) {
-                copingHTML = `<ul>${latest.copingStrategy.map(item => `<li>${item}</li>`).join('')}</ul>`;
+                const ul = document.createElement('ul');
+                latest.copingStrategy.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    ul.appendChild(li);
+                });
+                dashCopingContent.appendChild(ul);
             } else if (latest.copingStrategy.includes('\n')) {
-                copingHTML = `<ul>${latest.copingStrategy.split('\n').filter(line => line.trim().length > 0).map(line => `<li>${line.replace(/^[-\*\d\.\s]+/, '')}</li>`).join('')}</ul>`;
+                const ul = document.createElement('ul');
+                latest.copingStrategy.split('\n')
+                    .filter(line => line.trim().length > 0)
+                    .forEach(line => {
+                        const li = document.createElement('li');
+                        li.textContent = line.replace(/^[-\*\d\.\s]+/, '');
+                        ul.appendChild(li);
+                    });
+                dashCopingContent.appendChild(ul);
             } else {
-                copingHTML = `<p>${latest.copingStrategy}</p>`;
+                const p = document.createElement('p');
+                p.textContent = latest.copingStrategy;
+                dashCopingContent.appendChild(p);
             }
-            dashCopingContent.innerHTML = copingHTML;
         } else {
-            dashCopingContent.innerHTML = `<p class="empty-state">No custom coping strategy logged yet.</p>`;
+            const p = document.createElement('p');
+            p.className = 'empty-state';
+            p.textContent = "No custom coping strategy logged yet.";
+            dashCopingContent.replaceChildren(p);
         }
         
         // Render Line Chart
@@ -334,25 +386,51 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function drawMoodChart(dataPoints) {
         const svg = document.getElementById('mood-chart');
-        svg.innerHTML = ''; // Clear existing
+        svg.replaceChildren(); // Clear existing
         
         if (dataPoints.length === 0) {
-            svg.innerHTML = `<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" class="chart-axis-text">Write your journals to plot wellness trends</text>`;
+            const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            txt.setAttribute("x", "50%");
+            txt.setAttribute("y", "50%");
+            txt.setAttribute("dominant-baseline", "middle");
+            txt.setAttribute("text-anchor", "middle");
+            txt.setAttribute("class", "chart-axis-text");
+            txt.textContent = "Write your journals to plot wellness trends";
+            svg.appendChild(txt);
             return;
         }
 
         // Define SVG gradient
         const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-        defs.innerHTML = `
-            <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--accent-purple)" stop-opacity="1" />
-                <stop offset="100%" stop-color="var(--accent-blue)" stop-opacity="0.8" />
-            </linearGradient>
-            <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--accent-purple)" stop-opacity="0.25" />
-                <stop offset="100%" stop-color="var(--accent-blue)" stop-opacity="0.0" />
-            </linearGradient>
-        `;
+        
+        const grad1 = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+        grad1.setAttribute("id", "chart-gradient");
+        grad1.setAttribute("x1", "0"); grad1.setAttribute("y1", "0"); grad1.setAttribute("x2", "0"); grad1.setAttribute("y2", "1");
+        
+        const stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+        stop1.setAttribute("offset", "0%"); stop1.setAttribute("stop-color", "var(--accent-purple)"); stop1.setAttribute("stop-opacity", "1");
+        
+        const stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+        stop2.setAttribute("offset", "100%"); stop2.setAttribute("stop-color", "var(--accent-blue)"); stop2.setAttribute("stop-opacity", "0.8");
+        
+        grad1.appendChild(stop1);
+        grad1.appendChild(stop2);
+        
+        const grad2 = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+        grad2.setAttribute("id", "area-gradient");
+        grad2.setAttribute("x1", "0"); grad2.setAttribute("y1", "0"); grad2.setAttribute("x2", "0"); grad2.setAttribute("y2", "1");
+        
+        const stop3 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+        stop3.setAttribute("offset", "0%"); stop3.setAttribute("stop-color", "var(--accent-purple)"); stop3.setAttribute("stop-opacity", "0.25");
+        
+        const stop4 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+        stop4.setAttribute("offset", "100%"); stop4.setAttribute("stop-color", "var(--accent-blue)"); stop4.setAttribute("stop-opacity", "0.0");
+        
+        grad2.appendChild(stop3);
+        grad2.appendChild(stop4);
+        
+        defs.appendChild(grad1);
+        defs.appendChild(grad2);
         svg.appendChild(defs);
 
         const width = 600;
@@ -632,14 +710,30 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Triggers formatting
             if (entry.triggers && entry.triggers.length > 0) {
-                resTriggers.innerHTML = entry.triggers.map(trig => `<span class="trigger-chip">${trig}</span>`).join('');
+                resTriggers.replaceChildren();
+                entry.triggers.forEach(trig => {
+                    const span = document.createElement('span');
+                    span.className = 'trigger-chip';
+                    span.textContent = trig;
+                    resTriggers.appendChild(span);
+                });
             } else {
-                resTriggers.innerHTML = `<span class="trigger-chip">None detected</span>`;
+                const span = document.createElement('span');
+                span.className = 'trigger-chip';
+                span.textContent = 'None detected';
+                resTriggers.replaceChildren(span);
             }
             
             // Coping strategy text formatting
             if (Array.isArray(analysis.copingStrategy)) {
-                resCoping.innerHTML = `<ul>${analysis.copingStrategy.map(item => `<li>${item}</li>`).join('')}</ul>`;
+                resCoping.replaceChildren();
+                const ul = document.createElement('ul');
+                analysis.copingStrategy.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    ul.appendChild(li);
+                });
+                resCoping.appendChild(ul);
             } else {
                 resCoping.textContent = analysis.copingStrategy;
             }
@@ -679,7 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const chats = JSON.parse(localStorage.getItem('zenaura_chats') || '[]');
         if (chats.length === 0) return;
         
-        chatMessagesContainer.innerHTML = '';
+        chatMessagesContainer.replaceChildren();
         chats.forEach(msg => {
             appendMessageUI(msg.role, msg.text, msg.time);
         });
@@ -707,10 +801,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isCompanion ? 'companion' : 'user'}`;
         
-        messageDiv.innerHTML = `
-            <div class="msg-bubble">${text}</div>
-            <span class="msg-time">${time}</span>
-        `;
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'msg-bubble';
+        bubbleDiv.textContent = text;
+        
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'msg-time';
+        timeSpan.textContent = time;
+        
+        messageDiv.appendChild(bubbleDiv);
+        messageDiv.appendChild(timeSpan);
         
         chatMessagesContainer.appendChild(messageDiv);
         scrollChatToBottom();
@@ -720,11 +820,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const typingDiv = document.createElement('div');
         typingDiv.className = 'message companion typing-indicator-msg';
         typingDiv.id = 'zenaura-typing-indicator';
-        typingDiv.innerHTML = `
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-        `;
+        
+        for (let i = 0; i < 3; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'typing-dot';
+            typingDiv.appendChild(dot);
+        }
+        
         chatMessagesContainer.appendChild(typingDiv);
         scrollChatToBottom();
     }
@@ -791,14 +893,8 @@ document.addEventListener('DOMContentLoaded', () => {
     btnClearChat.addEventListener('click', () => {
         if (confirm("Are you sure you want to clear your chat history with Aura?")) {
             localStorage.setItem('zenaura_chats', JSON.stringify([]));
-            chatMessagesContainer.innerHTML = `
-                <div class="message companion">
-                    <div class="msg-bubble">
-                        Chat history cleared. I'm here to support you. What is on your mind?
-                    </div>
-                    <span class="msg-time">Just now</span>
-                </div>
-            `;
+            chatMessagesContainer.replaceChildren();
+            appendMessageUI('companion', "Chat history cleared. I'm here to support you. What is on your mind?", "Just now");
         }
     });
 
@@ -2108,8 +2204,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentX = (clientX - rect.left) * scaleX;
             const currentY = (clientY - rect.top) * scaleY;
             
-            console.log('ZenAura Drawing: ', { lastX, lastY, currentX, currentY, brushColor, brushSize });
-            
             // Apply stroke styles defensively during every path stroke
             ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
@@ -2139,8 +2233,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             lastX = (clientX - rect.left) * scaleX;
             lastY = (clientY - rect.top) * scaleY;
-            
-            console.log('ZenAura Draw Started: ', { lastX, lastY });
             
             // Apply initial brush properties
             ctx.strokeStyle = isEraser ? '#ffffff' : brushColor;
@@ -2243,7 +2335,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     lucide.createIcons();
                     
                     if (resVibes) {
-                        resVibes.innerHTML = '';
+                        resVibes.replaceChildren();
                         const vibesList = response.vibes || ["Zen Expression"];
                         vibesList.forEach(vibe => {
                             const chip = document.createElement('span');

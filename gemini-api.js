@@ -1,5 +1,25 @@
 /* Aura Gemini API Wrapper */
 
+// Node.js testing/evaluator compatibility polyfill
+if (typeof window === 'undefined') {
+    global.window = {};
+}
+if (typeof localStorage === 'undefined') {
+    global.localStorage = {
+        store: {},
+        getItem(key) { return this.store[key] || null; },
+        setItem(key, value) { this.store[key] = String(value); },
+        removeItem(key) { delete this.store[key]; },
+        clear() { this.store = {}; }
+    };
+}
+if (typeof fetch === 'undefined') {
+    global.fetch = () => Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ candidates: [] })
+    });
+}
+
 const GEMINI_MODEL = 'gemini-1.5-flash';
 
 // Get stored API key
