@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiKeyInput = document.getElementById('api-key-input');
     const btnToggleKeyVisibility = document.getElementById('btn-toggle-key-visibility');
     const keyStatusText = document.getElementById('key-status-text');
-    const keyStatusIcon = document.querySelector('#key-status i');
+    const keyStatusIcon = document.querySelector('#key-status i, #key-status svg');
     const keyStatusDiv = document.getElementById('key-status');
     
     // Theme Toggler Elements
@@ -178,10 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const storedTheme = localStorage.getItem('zenaura_theme') || 'light';
         if (storedTheme === 'dark') {
             document.body.classList.add('dark-theme');
-            btnToggleTheme.querySelector('i').setAttribute('data-lucide', 'sun');
+            btnToggleTheme.querySelector('i, svg').setAttribute('data-lucide', 'sun');
         } else {
             document.body.classList.remove('dark-theme');
-            btnToggleTheme.querySelector('i').setAttribute('data-lucide', 'moon');
+            btnToggleTheme.querySelector('i, svg').setAttribute('data-lucide', 'moon');
         }
 
         // Calculate and load stats
@@ -199,6 +199,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Check API key status
         updateApiKeyStatusUI();
+
+        // Initialize Zen Stress-Popper
+        initZenPopper();
+
+        // Initialize Zen Doodle Therapy
+        initDoodleTherapy();
+
+        // Initialize Voice Journaling
+        initVoiceJournaling();
+
+        // Initialize Theme Presets
+        initThemePresets();
     }
 
     // Update streak based on usage dates
@@ -470,6 +482,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (targetTab === 'chat') {
                 scrollChatToBottom();
             }
+
+            // Stop any active doodle melody when switching tabs
+            if (targetTab !== 'doodle') {
+                try {
+                    AudioSynth.stopComposerMelody();
+                    const pmBtn = document.getElementById('btn-play-melody');
+                    if (pmBtn) {
+                        pmBtn.classList.remove('active');
+                        const pmIcon = pmBtn.querySelector('i, svg');
+                        if (pmIcon) {
+                            pmIcon.setAttribute('data-lucide', 'play');
+                            lucide.createIcons();
+                        }
+                    }
+                    const mViz = document.getElementById('melody-viz');
+                    if (mViz) mViz.classList.add('hidden');
+                } catch (e) {}
+            }
         });
     });
 
@@ -494,10 +524,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDark = document.body.classList.toggle('dark-theme');
         if (isDark) {
             localStorage.setItem('zenaura_theme', 'dark');
-            btnToggleTheme.querySelector('i').setAttribute('data-lucide', 'sun');
+            btnToggleTheme.querySelector('i, svg').setAttribute('data-lucide', 'sun');
         } else {
             localStorage.setItem('zenaura_theme', 'light');
-            btnToggleTheme.querySelector('i').setAttribute('data-lucide', 'moon');
+            btnToggleTheme.querySelector('i, svg').setAttribute('data-lucide', 'moon');
         }
         lucide.createIcons();
     });
@@ -529,10 +559,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentType = apiKeyInput.getAttribute('type');
         if (currentType === 'password') {
             apiKeyInput.setAttribute('type', 'text');
-            btnToggleKeyVisibility.querySelector('i').setAttribute('data-lucide', 'eye-off');
+            btnToggleKeyVisibility.querySelector('i, svg').setAttribute('data-lucide', 'eye-off');
         } else {
             apiKeyInput.setAttribute('type', 'password');
-            btnToggleKeyVisibility.querySelector('i').setAttribute('data-lucide', 'eye');
+            btnToggleKeyVisibility.querySelector('i, svg').setAttribute('data-lucide', 'eye');
         }
         lucide.createIcons();
     });
@@ -988,8 +1018,14 @@ document.addEventListener('DOMContentLoaded', () => {
             gainNodes.push(gainL, gainR);
         }
 
+        let melodyInterval = null;
+
         // Stop all sound synth
         function stopAll() {
+            if (melodyInterval) {
+                clearInterval(melodyInterval);
+                melodyInterval = null;
+            }
             sources.forEach(src => {
                 try { src.stop(); } catch(e) {}
             });
@@ -1003,6 +1039,58 @@ document.addEventListener('DOMContentLoaded', () => {
             if (audioCtx) {
                 audioCtx.close();
                 audioCtx = null;
+            }
+        }
+
+        function playComposerMelody(frequencies, tempo, synthType) {
+            initAudio();
+            if (melodyInterval) {
+                clearInterval(melodyInterval);
+            }
+            
+            let noteIndex = 0;
+            const delay = tempo || 800;
+            const wave = synthType || 'triangle';
+            
+            function triggerNextChime() {
+                if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+                const freq = frequencies[noteIndex];
+                noteIndex = (noteIndex + 1) % frequencies.length;
+                
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.type = wave;
+                osc.frequency.setValueAtTime(freq, now);
+                
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.08, now + 0.03);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 2.5);
+                
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1200, now);
+                
+                osc.connect(gainNode);
+                gainNode.connect(filter);
+                filter.connect(audioCtx.destination);
+                
+                osc.start(now);
+                osc.stop(now + 2.8);
+                
+                sources.push(osc);
+                gainNodes.push(gainNode);
+            }
+            
+            triggerNextChime();
+            melodyInterval = setInterval(triggerNextChime, delay);
+        }
+        
+        function stopComposerMelody() {
+            if (melodyInterval) {
+                clearInterval(melodyInterval);
+                melodyInterval = null;
             }
         }
 
@@ -1061,6 +1149,8 @@ document.addEventListener('DOMContentLoaded', () => {
             playFocusBeats,
             playChimeAlarm,
             playBubblePop,
+            playComposerMelody,
+            stopComposerMelody,
             stopAll
         };
     })();
@@ -1076,14 +1166,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Deactivate other sounds
             soundItems.forEach(si => si.classList.remove('active'));
-            soundItems.forEach(si => si.querySelector('.sound-toggle i').setAttribute('data-lucide', 'play'));
+            soundItems.forEach(si => si.querySelector('.sound-toggle i, .sound-toggle svg').setAttribute('data-lucide', 'play'));
             AudioSynth.stopAll();
             soundViz.classList.add('hidden');
             
             if (!isActive) {
                 // Turn on this sound
                 item.classList.add('active');
-                toggleBtn.querySelector('i').setAttribute('data-lucide', 'square');
+                toggleBtn.querySelector('i, svg').setAttribute('data-lucide', 'square');
                 soundViz.classList.remove('sound-visualizer', 'hidden');
                 soundViz.classList.add('sound-visualizer');
                 
@@ -1107,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         breathingCircleTrigger.classList.add('breathing-active');
         btnBreathingControl.classList.add('active');
         btnBreathingControl.querySelector('span').textContent = 'Stop Session';
-        btnBreathingControl.querySelector('i').setAttribute('data-lucide', 'square');
+        btnBreathingControl.querySelector('i, svg').setAttribute('data-lucide', 'square');
         lucide.createIcons();
         
         const pattern = breathingPatternSelect.value;
@@ -1211,7 +1301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         btnBreathingControl.classList.remove('active');
         btnBreathingControl.querySelector('span').textContent = 'Start Guided Session';
-        btnBreathingControl.querySelector('i').setAttribute('data-lucide', 'play');
+        btnBreathingControl.querySelector('i, svg').setAttribute('data-lucide', 'play');
         lucide.createIcons();
         
         breathingStatusText.textContent = 'Ready';
@@ -1462,7 +1552,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnPomodoroText) btnPomodoroText.textContent = 'Pause';
         if (btnPomodoroToggle) {
             btnPomodoroToggle.classList.add('active');
-            const toggleIcon = btnPomodoroToggle.querySelector('i');
+            const toggleIcon = btnPomodoroToggle.querySelector('i, svg');
             if (toggleIcon) toggleIcon.setAttribute('data-lucide', 'pause');
         }
         lucide.createIcons();
@@ -1494,7 +1584,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnPomodoroText) btnPomodoroText.textContent = 'Start Focus';
         if (btnPomodoroToggle) {
             btnPomodoroToggle.classList.remove('active');
-            const toggleIcon = btnPomodoroToggle.querySelector('i');
+            const toggleIcon = btnPomodoroToggle.querySelector('i, svg');
             if (toggleIcon) toggleIcon.setAttribute('data-lucide', 'play');
         }
         lucide.createIcons();
@@ -1827,6 +1917,517 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateSelfCareProgress(parsed);
             } catch (e) {
                 console.error(e);
+            }
+        }
+    }
+
+    function initZenPopper() {
+        const popperGrid = document.getElementById('zen-popper-grid');
+        const btnResetPopper = document.getElementById('btn-reset-popper');
+        if (!popperGrid) return;
+        
+        const bubbles = popperGrid.querySelectorAll('.popper-bubble');
+        
+        // Load popped state from localStorage
+        let poppedBubbles = [];
+        try {
+            const saved = localStorage.getItem('zenaura_popped_stressors');
+            if (saved) {
+                poppedBubbles = JSON.parse(saved);
+            }
+        } catch (e) {
+            console.error('Error parsing popped stressors', e);
+        }
+        
+        // Set initial state based on localStorage
+        bubbles.forEach(bubble => {
+            const stressVal = bubble.getAttribute('data-stress');
+            const calmVal = bubble.getAttribute('data-calm');
+            const textEl = bubble.querySelector('.bubble-text');
+            
+            if (poppedBubbles.includes(stressVal)) {
+                bubble.classList.add('popped');
+                if (textEl) textEl.textContent = calmVal;
+            } else {
+                bubble.classList.remove('popped');
+                if (textEl) textEl.textContent = stressVal;
+            }
+            
+            // Add click listener
+            bubble.addEventListener('click', () => {
+                if (bubble.classList.contains('popped')) return;
+                
+                // Pop the bubble
+                bubble.classList.add('popped');
+                if (textEl) {
+                    setTimeout(() => {
+                        textEl.textContent = calmVal;
+                    }, 100);
+                }
+                
+                // Play sound via global AudioSynth
+                try {
+                    AudioSynth.playBubblePop();
+                } catch (err) {
+                    console.warn('Audio synthesis failed', err);
+                }
+                
+                // Spawn particle animation
+                spawnPopperParticles(bubble);
+                
+                // Save to localStorage
+                if (!poppedBubbles.includes(stressVal)) {
+                    poppedBubbles.push(stressVal);
+                    localStorage.setItem('zenaura_popped_stressors', JSON.stringify(poppedBubbles));
+                }
+            });
+        });
+        
+        // Reset popper button listener
+        if (btnResetPopper) {
+            btnResetPopper.addEventListener('click', () => {
+                poppedBubbles = [];
+                localStorage.removeItem('zenaura_popped_stressors');
+                
+                bubbles.forEach(bubble => {
+                    bubble.classList.remove('popped');
+                    const stressVal = bubble.getAttribute('data-stress');
+                    const textEl = bubble.querySelector('.bubble-text');
+                    if (textEl) {
+                        textEl.textContent = stressVal;
+                    }
+                });
+                
+                // Play a nice click sound
+                try {
+                    AudioSynth.playBubblePop();
+                } catch (err) {}
+            });
+        }
+    }
+    
+    function spawnPopperParticles(bubble) {
+        const card = document.getElementById('zen-popper-card');
+        if (!card) return;
+        
+        const bubbleRect = bubble.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        
+        const x = bubbleRect.left - cardRect.left + bubbleRect.width / 2;
+        const y = bubbleRect.top - cardRect.top + bubbleRect.height / 2;
+        
+        const numParticles = 16;
+        for (let i = 0; i < numParticles; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'zen-particle';
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            
+            // Velocity calculation: random angle and speed for explosion
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 40 + Math.random() * 80;
+            const dx = Math.cos(angle) * speed;
+            const dy = Math.sin(angle) * speed;
+            
+            particle.style.setProperty('--dx', `${dx}px`);
+            particle.style.setProperty('--dy', `${dy}px`);
+            
+            const size = 5 + Math.random() * 6;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            card.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 600);
+        }
+    }
+
+    // ==========================================================================
+    // ZEN DOODLE THERAPY CANVAS & ANALYSIS LOGIC
+    // ==========================================================================
+    function initDoodleTherapy() {
+        const canvas = document.getElementById('doodle-canvas');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const clearBtn = document.getElementById('btn-clear-doodle');
+        const analyzeBtn = document.getElementById('btn-analyze-doodle');
+        const brushSizeSlider = document.getElementById('doodle-brush-size');
+        const colorsContainer = document.getElementById('doodle-colors-list');
+        const colorBtns = colorsContainer ? colorsContainer.querySelectorAll('.color-btn') : [];
+        
+        const emptyState = document.getElementById('doodle-empty');
+        const loadingState = document.getElementById('doodle-loading');
+        const contentState = document.getElementById('doodle-content');
+        
+        const resAnalysis = document.getElementById('doodle-res-analysis');
+        const resVibes = document.getElementById('doodle-res-vibes');
+        const resCoping = document.getElementById('doodle-res-coping');
+        
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let brushColor = '#7c3aed';
+        let brushSize = 6;
+        let isEraser = false;
+        
+        let activeMelody = null;
+        let isMelodyPlaying = false;
+        const playMelodyBtn = document.getElementById('btn-play-melody');
+        const melodyViz = document.getElementById('melody-viz');
+        
+        // Initialize canvas background (white background is critical for contrast)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Drawing configurations
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = brushColor;
+        ctx.lineWidth = brushSize;
+        
+        // Drawing event handlers
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            // Get coordinates relative to canvas
+            const rect = canvas.getBoundingClientRect();
+            
+            // Defend against division by zero if canvas is styled display:none
+            const width = rect.width || canvas.width;
+            const height = rect.height || canvas.height;
+            
+            const scaleX = canvas.width / width;
+            const scaleY = canvas.height / height;
+            
+            const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+            const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+            
+            const currentX = (clientX - rect.left) * scaleX;
+            const currentY = (clientY - rect.top) * scaleY;
+            
+            console.log('ZenAura Drawing: ', { lastX, lastY, currentX, currentY, brushColor, brushSize });
+            
+            // Apply stroke styles defensively during every path stroke
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = isEraser ? '#ffffff' : brushColor;
+            ctx.lineWidth = brushSize;
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(currentX, currentY);
+            ctx.stroke();
+            
+            [lastX, lastY] = [currentX, currentY];
+        }
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            
+            const width = rect.width || canvas.width;
+            const height = rect.height || canvas.height;
+            
+            const scaleX = canvas.width / width;
+            const scaleY = canvas.height / height;
+            
+            const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+            const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+            
+            lastX = (clientX - rect.left) * scaleX;
+            lastY = (clientY - rect.top) * scaleY;
+            
+            console.log('ZenAura Draw Started: ', { lastX, lastY });
+            
+            // Apply initial brush properties
+            ctx.strokeStyle = isEraser ? '#ffffff' : brushColor;
+            ctx.lineWidth = brushSize;
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        // Mouse Listeners
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+        
+        // Touch Listeners (for mobile devices)
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startDrawing(e);
+        });
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            draw(e);
+        });
+        canvas.addEventListener('touchend', stopDrawing);
+        
+        // Brush Color Pickers
+        colorBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                colorBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const selectedColor = btn.getAttribute('data-color');
+                if (btn.id === 'btn-eraser') {
+                    isEraser = true;
+                    ctx.strokeStyle = '#ffffff';
+                } else {
+                    isEraser = false;
+                    brushColor = selectedColor;
+                    ctx.strokeStyle = brushColor;
+                }
+            });
+        });
+        
+        // Brush Size Slider
+        if (brushSizeSlider) {
+            brushSizeSlider.addEventListener('input', () => {
+                brushSize = brushSizeSlider.value;
+                ctx.lineWidth = brushSize;
+            });
+        }
+        
+        // Clear Canvas
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                if (isEraser) {
+                    ctx.strokeStyle = '#ffffff';
+                } else {
+                    ctx.strokeStyle = brushColor;
+                }
+            });
+        }
+        
+        // Analyze Doodle
+        if (analyzeBtn) {
+            analyzeBtn.addEventListener('click', async () => {
+                emptyState.classList.add('hidden');
+                contentState.classList.add('hidden');
+                loadingState.classList.remove('hidden');
+                
+                try {
+                    const dataUrl = canvas.toDataURL('image/png');
+                    const base64Data = dataUrl.split(',')[1];
+                    
+                    const response = await window.ZenAuraAI.analyzeDoodleWithAI(base64Data);
+                    
+                    resAnalysis.textContent = response.analysis || "Processed drawing successfully.";
+                    
+                    // Set custom chimes composition from response
+                    activeMelody = response.melody || {
+                        frequencies: [261.63, 293.66, 329.63, 392.00, 440.00],
+                        tempo: 800,
+                        synthType: "triangle"
+                    };
+                    
+                    // Reset composer playback UI
+                    isMelodyPlaying = false;
+                    AudioSynth.stopComposerMelody();
+                    if (playMelodyBtn) {
+                        playMelodyBtn.classList.remove('active');
+                        const pmIcon = playMelodyBtn.querySelector('i, svg');
+                        if (pmIcon) pmIcon.setAttribute('data-lucide', 'play');
+                    }
+                    if (melodyViz) {
+                        melodyViz.classList.add('hidden');
+                    }
+                    lucide.createIcons();
+                    
+                    if (resVibes) {
+                        resVibes.innerHTML = '';
+                        const vibesList = response.vibes || ["Zen Expression"];
+                        vibesList.forEach(vibe => {
+                            const chip = document.createElement('span');
+                            chip.className = 'trigger-chip';
+                            chip.style.backgroundColor = 'var(--accent-purple-glow)';
+                            chip.style.color = 'var(--accent-purple)';
+                            chip.textContent = vibe;
+                            resVibes.appendChild(chip);
+                        });
+                    }
+                    
+                    if (resCoping) {
+                        resCoping.textContent = response.coping || "Take a slow deep breath.";
+                    }
+                    
+                    loadingState.classList.add('hidden');
+                    contentState.classList.remove('hidden');
+                    
+                } catch (error) {
+                    console.error("Doodle analysis error:", error);
+                    alert("Unable to analyze doodle. Please check your Gemini API key or network connection.");
+                    loadingState.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                }
+            });
+        }
+
+        if (playMelodyBtn) {
+            playMelodyBtn.addEventListener('click', () => {
+                if (!activeMelody) return;
+                
+                isMelodyPlaying = !isMelodyPlaying;
+                
+                if (isMelodyPlaying) {
+                    playMelodyBtn.classList.add('active');
+                    const pmIcon = playMelodyBtn.querySelector('i, svg');
+                    if (pmIcon) pmIcon.setAttribute('data-lucide', 'square');
+                    lucide.createIcons();
+                    
+                    if (melodyViz) {
+                        melodyViz.classList.remove('hidden');
+                    }
+                    
+                    // Stop standard ambient loops
+                    soundItems.forEach(si => si.classList.remove('active'));
+                    soundItems.forEach(si => si.querySelector('.sound-toggle i, .sound-toggle svg').setAttribute('data-lucide', 'play'));
+                    soundViz.classList.add('hidden');
+                    
+                    AudioSynth.playComposerMelody(activeMelody.frequencies, activeMelody.tempo, activeMelody.synthType);
+                } else {
+                    playMelodyBtn.classList.remove('active');
+                    const pmIcon = playMelodyBtn.querySelector('i, svg');
+                    if (pmIcon) pmIcon.setAttribute('data-lucide', 'play');
+                    lucide.createIcons();
+                    
+                    if (melodyViz) {
+                        melodyViz.classList.add('hidden');
+                    }
+                    
+                    AudioSynth.stopComposerMelody();
+                }
+            });
+        }
+    }
+
+    // ==========================================================================
+    // VOICE JOURNALING SPEECH-TO-TEXT LOGIC
+    // ==========================================================================
+    function initVoiceJournaling() {
+        const micBtn = document.getElementById('btn-voice-journal');
+        const journalText = document.getElementById('journal-text');
+        const micStatus = document.getElementById('mic-status-text');
+        
+        if (!micBtn || !journalText) return;
+        
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            micBtn.style.opacity = '0.5';
+            micBtn.style.cursor = 'not-allowed';
+            micBtn.title = 'Speech-to-Text not supported in your browser (use Chrome or Edge)';
+            if (micStatus) micStatus.textContent = 'Unsupported';
+            return;
+        }
+        
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        
+        let isRecording = false;
+        
+        recognition.onstart = () => {
+            isRecording = true;
+            micBtn.classList.add('recording');
+            if (micStatus) micStatus.textContent = 'Listening...';
+            const icon = micBtn.querySelector('i, svg');
+            if (icon) {
+                icon.setAttribute('data-lucide', 'mic-off');
+                lucide.createIcons();
+            }
+        };
+        
+        recognition.onend = () => {
+            isRecording = false;
+            micBtn.classList.remove('recording');
+            if (micStatus) micStatus.textContent = 'Speak';
+            const icon = micBtn.querySelector('i, svg');
+            if (icon) {
+                icon.setAttribute('data-lucide', 'mic');
+                lucide.createIcons();
+            }
+        };
+        
+        recognition.onerror = (e) => {
+            console.error("Speech recognition error:", e.error);
+            isRecording = false;
+            micBtn.classList.remove('recording');
+            if (micStatus) micStatus.textContent = 'Error';
+            setTimeout(() => {
+                if (micStatus) micStatus.textContent = 'Speak';
+            }, 2000);
+        };
+        
+        recognition.onresult = (e) => {
+            const transcript = e.results[0][0].transcript;
+            const currentValue = journalText.value.trim();
+            if (currentValue) {
+                journalText.value = currentValue + ' ' + transcript;
+            } else {
+                journalText.value = transcript;
+            }
+            journalText.dispatchEvent(new Event('input'));
+        };
+        
+        micBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+    }
+
+    function initThemePresets() {
+        const dots = document.querySelectorAll('.preset-color-dot');
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('zenaura_accent_theme') || 'violet';
+        applyAccentTheme(savedTheme);
+        
+        dots.forEach(dot => {
+            const theme = dot.getAttribute('data-theme');
+            if (theme === savedTheme) {
+                dots.forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+            }
+            
+            dot.addEventListener('click', () => {
+                dots.forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+                applyAccentTheme(theme);
+                localStorage.setItem('zenaura_accent_theme', theme);
+            });
+        });
+        
+        function applyAccentTheme(theme) {
+            const root = document.documentElement;
+            if (theme === 'violet') {
+                root.style.setProperty('--accent-purple', '#7c3aed');
+                root.style.setProperty('--accent-purple-glow', 'rgba(124, 58, 237, 0.08)');
+                root.style.setProperty('--bg-nav-active', 'rgba(124, 58, 237, 0.08)');
+            } else if (theme === 'ocean') {
+                root.style.setProperty('--accent-purple', '#2563eb');
+                root.style.setProperty('--accent-purple-glow', 'rgba(37, 99, 235, 0.08)');
+                root.style.setProperty('--bg-nav-active', 'rgba(37, 99, 235, 0.08)');
+            } else if (theme === 'emerald') {
+                root.style.setProperty('--accent-purple', '#0d9488');
+                root.style.setProperty('--accent-purple-glow', 'rgba(13, 148, 136, 0.08)');
+                root.style.setProperty('--bg-nav-active', 'rgba(13, 148, 136, 0.08)');
+            } else if (theme === 'sunset') {
+                root.style.setProperty('--accent-purple', '#e11d48');
+                root.style.setProperty('--accent-purple-glow', 'rgba(225, 29, 72, 0.08)');
+                root.style.setProperty('--bg-nav-active', 'rgba(225, 29, 72, 0.08)');
             }
         }
     }

@@ -282,6 +282,125 @@ function getMockChatResponse(userMessage) {
     });
 }
 
+/**
+ * Call Gemini API to analyze a doodle.
+ * Returns structured JSON with artistic insights.
+ */
+async function analyzeDoodleWithAI(base64Image) {
+    const apiKey = getApiKey();
+    
+    if (!apiKey) {
+        // Fallback to mock analysis if no API key is provided
+        return getMockDoodleAnalysis();
+    }
+    
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+    
+    const systemInstruction = `You are ZenAura, an empathetic student mental wellness advisor. 
+Analyze the student's doodle drawing. They scribble/doodle to vent study stress, mock test anxiety, or general fatigue.
+Look at the shapes, lines, colors, and patterns in their drawing.
+Evaluate the image and output a JSON object containing:
+1. "vibes": An array of up to 3 strings identifying the emotional vibes (e.g. "Overwhelmed Strokes", "Scribbled Tension", "Calming Blues", "Bright Sparks").
+2. "analysis": 3-4 sentences of empathetic, warm validation and artistic interpretation of their drawing. Suggest what their colors or patterns might say about their focus, stress, or creative energy.
+3. "coping": A warm, encouraging suggestion or mindfulness tip.
+4. "melody": An object composing a custom sound-healing chimes loop:
+   - "frequencies": Array of 4 to 6 numbers representing notes in Hz (use higher/pentatonic notes like 261.63, 293.66, 329.63, 392.0, 440.0, 523.25 for calm/happy, lower minor pentatonic notes like 196.0, 220.0, 233.08, 293.66, 349.23 for stress/anger).
+   - "tempo": Delay between chimes in milliseconds (e.g., 500 to 1200).
+   - "synthType": Either "sine" or "triangle" for the timbre wave.
+
+Return ONLY the raw JSON object. Do not wrap it in markdown code blocks.`;
+
+    const requestBody = {
+        contents: [
+            {
+                role: 'user',
+                parts: [
+                    {
+                        inlineData: {
+                            mimeType: "image/png",
+                            data: base64Image
+                        }
+                    },
+                    {
+                        text: "Analyze my doodle therapy drawing. It reflects how I am feeling right now during exam prep."
+                    }
+                ]
+            }
+        ],
+        systemInstruction: {
+            parts: [{ text: systemInstruction }]
+        },
+        generationConfig: {
+            responseMimeType: 'application/json'
+        }
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+        
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error?.message || `HTTP error! Status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const rawJsonText = data.candidates[0].content.parts[0].text;
+        
+        return JSON.parse(rawJsonText.trim());
+    } catch (error) {
+        console.error("Gemini API Doodle Error:", error);
+        throw error;
+    }
+}
+
+function getMockDoodleAnalysis() {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const mockAnalyses = [
+                {
+                    vibes: ["Calming Purple", "Thoughtful Focus", "Soft Flow"],
+                    analysis: "Your drawing shows a balanced flow with gentle, winding lines. The use of soft colors suggests a desire to find order amidst exam chaos. It feels like you are looking for a peaceful, quiet space to organize your mind.",
+                    coping: "Try a 5-minute resonance breathing session to match this calm, flowing energy. You are on the right track.",
+                    melody: {
+                        frequencies: [261.63, 293.66, 329.63, 392.00, 440.00],
+                        tempo: 800,
+                        synthType: "triangle"
+                    }
+                },
+                {
+                    vibes: ["High Energy", "Sparks of Ideas", "Mock Exam Pressure"],
+                    analysis: "There are sharp angles and vibrant strokes in your sketch, indicating a high level of mental activity. You might be feeling restless, overly excited, or anxious to solve study backlogs. It's a sign of determination, but also potential burnout.",
+                    coping: "Engage in box breathing to ground this high energy. Take a 10-minute active screen detox break right now.",
+                    melody: {
+                        frequencies: [329.63, 392.00, 440.00, 523.25, 587.33],
+                        tempo: 500,
+                        synthType: "sine"
+                    }
+                },
+                {
+                    vibes: ["Chaotic Venting", "Overwhelmed Scribble", "Tension Release"],
+                    analysis: "The dense overlays and intense strokes suggest that your mind is currently feeling cluttered or overwhelmed by syllabus load. Drawing like this is a very healthy way to vent out frustration that you can't describe in words.",
+                    coping: "Use our 'Stress-Popper' to release this tension physically, and try to break down your study topics into tiny 15-minute segments.",
+                    melody: {
+                        frequencies: [196.00, 220.00, 233.08, 293.66, 349.23],
+                        tempo: 1100,
+                        synthType: "triangle"
+                    }
+                }
+            ];
+            
+            const randomResult = mockAnalyses[Math.floor(Math.random() * mockAnalyses.length)];
+            resolve(randomResult);
+        }, 1500); // Simulate network latency
+    });
+}
+
 // Export functions to global scope
 window.ZenAuraAI = {
     getApiKey,
@@ -289,5 +408,11 @@ window.ZenAuraAI = {
     saveApiKey,
     clearApiKey,
     analyzeJournalWithAI,
-    generateChatResponse
+    generateChatResponse,
+    analyzeDoodleWithAI
 };
+
+// CommonJS export for Jest unit testing environment
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = window.ZenAuraAI;
+}

@@ -17,8 +17,8 @@
     <!-- CSS Stylesheet -->
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide Icons CDN (Pinned JSDelivr for ultra-fast cached loading) -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
     <!-- Ambient background blobs -->
@@ -57,6 +57,14 @@
                     <i data-lucide="heart"></i>
                     <span>Calm Room</span>
                 </button>
+                <button class="nav-btn" data-tab="popper" id="btn-popper">
+                    <i data-lucide="sparkles"></i>
+                    <span>Stress Popper</span>
+                </button>
+                <button class="nav-btn" data-tab="doodle" id="btn-doodle">
+                    <i data-lucide="palette"></i>
+                    <span>Doodle Therapy</span>
+                </button>
             </nav>
             
             <div class="sidebar-footer">
@@ -85,6 +93,13 @@
                         <i data-lucide="shield-alert"></i>
                     </button>
                     
+                    <div class="theme-preset-picker" title="Change Aura Accent Color">
+                        <button type="button" class="preset-color-dot active" data-theme="violet" style="background-color: #7c3aed;" aria-label="Violet Accent Theme" title="Violet Aura"></button>
+                        <button type="button" class="preset-color-dot" data-theme="ocean" style="background-color: #2563eb;" aria-label="Blue Accent Theme" title="Ocean Calm"></button>
+                        <button type="button" class="preset-color-dot" data-theme="emerald" style="background-color: #0d9488;" aria-label="Teal Accent Theme" title="Emerald Forest"></button>
+                        <button type="button" class="preset-color-dot" data-theme="sunset" style="background-color: #e11d48;" aria-label="Rose Accent Theme" title="Sunset Glow"></button>
+                    </div>
+
                     <button class="header-action-btn" id="btn-toggle-theme" title="Toggle Light/Dark Theme">
                         <i data-lucide="moon"></i>
                     </button>
@@ -245,7 +260,12 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="journal-text" class="form-label">Write your thoughts</label>
+                                    <div class="form-label-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <label for="journal-text" class="form-label" style="margin-bottom: 0;">Write your thoughts</label>
+                                        <button type="button" class="voice-mic-btn" id="btn-voice-journal" title="Speak instead of typing">
+                                            <i data-lucide="mic"></i> <span id="mic-status-text">Speak</span>
+                                        </button>
+                                    </div>
                                     <textarea id="journal-text" class="journal-textarea" placeholder="Today was tough. I spent 8 hours studying biology but mock test scores aren't improving. I feel like I'll disappoint everyone..." required></textarea>
                                 </div>
                                 
@@ -505,6 +525,156 @@
                             </div>
                         </div>
                         
+                    </div>
+                </section>
+
+                <!-- 5. ZEN STRESS-POPPER VIEW -->
+                <section class="view-panel" id="view-popper">
+                    <div class="popper-view-layout">
+                        <!-- Zen Stress-Popper Card -->
+                        <div class="card zen-popper-card" id="zen-popper-card">
+                            <div class="popper-header">
+                                <div>
+                                    <h3 class="card-title">Zen Stress-Popper</h3>
+                                    <p class="card-subtitle">Feeling overwhelmed? Pop away your stressors to transform them into positive affirmations. Relieve your exam anxiety here!</p>
+                                </div>
+                                <button id="btn-reset-popper" class="secondary-btn flex-center">
+                                    <i data-lucide="refresh-cw"></i> Reset Popper
+                                </button>
+                            </div>
+                            <div class="zen-popper-grid" id="zen-popper-grid">
+                                <div class="popper-bubble" data-stress="Backlogs" data-calm="Growth">
+                                    <span class="bubble-text">Backlogs</span>
+                                </div>
+                                <div class="popper-bubble" data-stress="Anxiety" data-calm="Calm">
+                                    <span class="bubble-text">Anxiety</span>
+                                </div>
+                                <div class="popper-bubble" data-stress="Physics" data-calm="Focus">
+                                    <span class="bubble-text">Physics</span>
+                                </div>
+                                <div class="popper-bubble" data-stress="Mock Scores" data-calm="Clarity">
+                                    <span class="bubble-text">Mock Scores</span>
+                                </div>
+                                <div class="popper-bubble" data-stress="Peer Pressure" data-calm="Peace">
+                                    <span class="bubble-text">Peer Pressure</span>
+                                </div>
+                                <div class="popper-bubble" data-stress="Ranks" data-calm="Strength">
+                                    <span class="bubble-text">Ranks</span>
+                                </div>
+                                <div class="popper-bubble" data-stress="Tension" data-calm="Relax">
+                                    <span class="bubble-text">Tension</span>
+                                </div>
+                                <div class="popper-bubble" data-stress="Syllabus" data-calm="Hope">
+                                    <span class="bubble-text">Syllabus</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. ZEN DOODLE THERAPY VIEW -->
+                <section class="view-panel" id="view-doodle">
+                    <div class="doodle-view-layout">
+                        <!-- Left Panel: Drawing Canvas -->
+                        <div class="card doodle-canvas-card">
+                            <h3 class="card-title">Scribble & Doodle Therapy</h3>
+                            <p class="card-subtitle">Draw whatever is on your mind—shapes, scribbles, colors, or scenes. ZenAura AI will look at your drawing to understand your feelings.</p>
+                            
+                            <div class="doodle-canvas-wrapper">
+                                <canvas id="doodle-canvas" width="550" height="360" aria-label="Doodle drawing canvas" role="img">Your browser does not support HTML5 canvas.</canvas>
+                            </div>
+                            
+                            <div class="canvas-controls-bar">
+                                <div class="tool-section">
+                                    <span class="tool-label">Colors:</span>
+                                    <div class="doodle-color-picker" id="doodle-colors-list">
+                                        <button type="button" class="color-btn active" data-color="#7c3aed" style="--btn-color: #7c3aed;" title="Purple"></button>
+                                        <button type="button" class="color-btn" data-color="#2563eb" style="--btn-color: #2563eb;" title="Blue"></button>
+                                        <button type="button" class="color-btn" data-color="#0d9488" style="--btn-color: #0d9488;" title="Teal"></button>
+                                        <button type="button" class="color-btn" data-color="#e11d48" style="--btn-color: #e11d48;" title="Rose"></button>
+                                        <button type="button" class="color-btn" data-color="#f59e0b" style="--btn-color: #f59e0b;" title="Amber"></button>
+                                        <button type="button" class="color-btn" data-color="#0f172a" style="--btn-color: #0f172a;" title="Dark"></button>
+                                        <button type="button" class="color-btn" data-color="#ffffff" style="--btn-color: #ffffff; border: 1.5px dashed var(--border-color);" id="btn-eraser" title="Eraser"></button>
+                                    </div>
+                                </div>
+                                
+                                <div class="tool-section">
+                                    <span class="tool-label">Size:</span>
+                                    <input type="range" id="doodle-brush-size" class="brush-slider" min="2" max="24" value="6">
+                                </div>
+                                
+                                <button type="button" id="btn-clear-doodle" class="secondary-btn flex-center">
+                                    <i data-lucide="trash-2"></i> <span>Clear</span>
+                                </button>
+                            </div>
+                            
+                            <button type="button" class="submit-btn" id="btn-analyze-doodle" style="margin-top: 15px; width: 100%;">
+                                <i data-lucide="sparkles"></i>
+                                <span>Analyze Drawing with ZenAura AI</span>
+                            </button>
+                        </div>
+
+                        <!-- Right Panel: AI Results -->
+                        <div class="card doodle-results-card" id="doodle-results-panel">
+                            <!-- Empty State -->
+                            <div class="results-empty-state" id="doodle-empty">
+                                <i data-lucide="palette" class="empty-icon"></i>
+                                <h4>Ready for Doodle Analysis</h4>
+                                <p>Express yourself on the canvas using any colors or shapes, then click 'Analyze Drawing'. ZenAura will provide a personalized emotional wellness reading.</p>
+                            </div>
+                            
+                            <!-- Loading State -->
+                            <div class="results-loading-state hidden" id="doodle-loading">
+                                <div class="zenaura-pulse-loader"></div>
+                                <p>ZenAura AI is analyzing the colors and strokes of your doodle...</p>
+                            </div>
+                            
+                            <!-- Content State -->
+                            <div class="results-content hidden" id="doodle-content">
+                                <div class="results-header">
+                                    <h4 class="results-title">ZenAura's Doodle Interpretation</h4>
+                                </div>
+                                
+                                <div class="results-body">
+                                    <div class="res-section">
+                                        <h5 class="res-sec-title"><i data-lucide="eye"></i> AI Interpretation</h5>
+                                        <p id="doodle-res-analysis">Analyzing doodle patterns...</p>
+                                    </div>
+                                    
+                                    <div class="res-section">
+                                        <h5 class="res-sec-title"><i data-lucide="activity"></i> Detected Aura Vibes</h5>
+                                        <div class="trigger-chips-container" id="doodle-res-vibes">
+                                            <!-- Dynamic Vibe Tags -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="res-section">
+                                        <h5 class="res-sec-title"><i data-lucide="heart"></i> Supportive Message</h5>
+                                        <p id="doodle-res-coping">A supportive coping suggestion will appear here.</p>
+                                    </div>
+
+                                    <!-- New AI Melody Player Card -->
+                                    <div class="doodle-melody-card card-glow-purple" style="margin-top: 20px; border-radius: 16px; padding: 16px;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px;">
+                                            <div>
+                                                <h5 class="res-sec-title" style="margin-bottom: 2px;"><i data-lucide="music"></i> Custom Healing Melody</h5>
+                                                <p style="font-size: 12px; color: var(--text-muted);">AI composed loops to soothe your drawing vibes</p>
+                                            </div>
+                                            <button type="button" class="play-melody-btn" id="btn-play-melody" aria-label="Play Custom Zen Melody" title="Play Composer Melody">
+                                                <i data-lucide="play"></i>
+                                            </button>
+                                        </div>
+                                        <div class="melody-viz-container hidden" id="melody-viz">
+                                            <div class="viz-dot"></div>
+                                            <div class="viz-dot"></div>
+                                            <div class="viz-dot"></div>
+                                            <div class="viz-dot"></div>
+                                            <div class="viz-dot"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
                 
