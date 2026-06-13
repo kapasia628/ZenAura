@@ -1,6 +1,6 @@
-# Sattva — AI Student Mental Wellness Companion
+# ZenAura — AI Student Mental Wellness Companion
 
-Sattva is an empathetic, Generative AI-powered mental wellness application designed to help students preparing for board exams and competitive entrance tests (e.g., NEET, JEE, CUET, CAT, GATE, UPSC) monitor and improve their emotional well-being.
+ZenAura is an empathetic, Generative AI-powered mental wellness application designed to help students preparing for board exams and competitive entrance tests (e.g., NEET, JEE, CUET, CAT, GATE, UPSC) monitor and improve their emotional well-being.
 
 Built for the **Google PromptWars (Build with AI)** challenge.
 
@@ -8,7 +8,7 @@ Built for the **Google PromptWars (Build with AI)** challenge.
 
 1. **Dashboard & Analytics**: Track mood history, stress levels, and triggers automatically extracted from daily journaling using a dynamic SVG line chart.
 2. **AI Journal & Stress Analyzer**: Leverages Google Gemini 1.5 Flash to parse open-ended daily reflections, highlighting emotional patterns and offering custom coping cards.
-3. **Sattva Empathetic Companion**: A friendly conversational AI bot prepared to talk students through exam pressure, burnout, test failures, and focus challenges.
+3. **ZenAura Empathetic Companion**: A friendly conversational AI bot prepared to talk students through exam pressure, burnout, test failures, and focus challenges.
 4. **Mindfulness & Calm Room**: 
    - Interactive guided breathing bubble with presets (4-7-8 Deep Calming, 4-4 Box Breathing, 5-5 Resonance).
    - Custom synthesized ambient sound generator (Rain, Forest wind, Waves, Binaural Focus Beats) using the **HTML5 Web Audio API** (100% offline, zero network required).

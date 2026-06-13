@@ -1,4 +1,4 @@
-/* Sattva — AI Student Mental Wellness Companion Core Logic */
+/* ZenAura — AI Student Mental Wellness Companion Core Logic */
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Lucide Icons
@@ -158,24 +158,24 @@ document.addEventListener('DOMContentLoaded', () => {
         else greetingText.textContent = "Good evening, Warrior";
         
         // Init LocalStorage keys if not present
-        if (!localStorage.getItem('sattva_journals')) {
-            localStorage.setItem('sattva_journals', JSON.stringify([]));
+        if (!localStorage.getItem('zenaura_journals')) {
+            localStorage.setItem('zenaura_journals', JSON.stringify([]));
         }
-        if (!localStorage.getItem('sattva_chats')) {
-            localStorage.setItem('sattva_chats', JSON.stringify([]));
+        if (!localStorage.getItem('zenaura_chats')) {
+            localStorage.setItem('zenaura_chats', JSON.stringify([]));
         }
-        if (!localStorage.getItem('sattva_mindfulness_count')) {
-            localStorage.setItem('sattva_mindfulness_count', '0');
+        if (!localStorage.getItem('zenaura_mindfulness_count')) {
+            localStorage.setItem('zenaura_mindfulness_count', '0');
         }
-        if (!localStorage.getItem('sattva_streak')) {
-            localStorage.setItem('sattva_streak', '1');
+        if (!localStorage.getItem('zenaura_streak')) {
+            localStorage.setItem('zenaura_streak', '1');
         }
-        if (!localStorage.getItem('sattva_last_active_date')) {
-            localStorage.setItem('sattva_last_active_date', new Date().toLocaleDateString());
+        if (!localStorage.getItem('zenaura_last_active_date')) {
+            localStorage.setItem('zenaura_last_active_date', new Date().toLocaleDateString());
         }
 
         // Init theme (Light mode default)
-        const storedTheme = localStorage.getItem('sattva_theme') || 'light';
+        const storedTheme = localStorage.getItem('zenaura_theme') || 'light';
         if (storedTheme === 'dark') {
             document.body.classList.add('dark-theme');
             btnToggleTheme.querySelector('i').setAttribute('data-lucide', 'sun');
@@ -203,8 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update streak based on usage dates
     function updateStreakAndStats() {
-        const lastDateStr = localStorage.getItem('sattva_last_active_date');
-        const streak = parseInt(localStorage.getItem('sattva_streak') || '1');
+        const lastDateStr = localStorage.getItem('zenaura_last_active_date');
+        const streak = parseInt(localStorage.getItem('zenaura_streak') || '1');
         const todayStr = new Date().toLocaleDateString();
         
         if (lastDateStr !== todayStr) {
@@ -216,25 +216,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (diffDays === 1) {
                 // Streak continues!
                 const newStreak = streak + 1;
-                localStorage.setItem('sattva_streak', newStreak.toString());
+                localStorage.setItem('zenaura_streak', newStreak.toString());
             } else if (diffDays > 1) {
                 // Reset streak
-                localStorage.setItem('sattva_streak', '1');
+                localStorage.setItem('zenaura_streak', '1');
             }
-            localStorage.setItem('sattva_last_active_date', todayStr);
+            localStorage.setItem('zenaura_last_active_date', todayStr);
         }
         
-        const currentStreak = localStorage.getItem('sattva_streak');
+        const currentStreak = localStorage.getItem('zenaura_streak');
         streakCountHeader.textContent = `${currentStreak} Day Streak`;
         
         // Update mindfulness counter card
-        const mindfulCount = localStorage.getItem('sattva_mindfulness_count') || '0';
+        const mindfulCount = localStorage.getItem('zenaura_mindfulness_count') || '0';
         dashMindfulVal.textContent = `${mindfulCount} Session${mindfulCount !== '1' ? 's' : ''}`;
     }
 
     // Render Dashboard UI elements using stored values
     function updateDashboardView() {
-        const journals = JSON.parse(localStorage.getItem('sattva_journals') || '[]');
+        const journals = JSON.parse(localStorage.getItem('zenaura_journals') || '[]');
         
         if (journals.length === 0) {
             dashMoodVal.textContent = "Not Logged";
@@ -301,12 +301,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update the API Key status indicators
     function updateApiKeyStatusUI() {
-        const isConfigured = window.SattvaAI.isApiKeyConfigured();
+        const isConfigured = window.ZenAuraAI.isApiKeyConfigured();
         if (isConfigured) {
             keyStatusDiv.className = 'key-status-indicator success';
             keyStatusText.textContent = 'Gemini API Key saved and active.';
             keyStatusIcon.setAttribute('data-lucide', 'check-circle-2');
-            apiKeyInput.value = window.SattvaAI.getApiKey();
+            apiKeyInput.value = window.ZenAuraAI.getApiKey();
         } else {
             keyStatusDiv.className = 'key-status-indicator info';
             keyStatusText.textContent = 'No Gemini API key stored yet. Demo prompts will run locally.';
@@ -493,10 +493,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btnToggleTheme.addEventListener('click', () => {
         const isDark = document.body.classList.toggle('dark-theme');
         if (isDark) {
-            localStorage.setItem('sattva_theme', 'dark');
+            localStorage.setItem('zenaura_theme', 'dark');
             btnToggleTheme.querySelector('i').setAttribute('data-lucide', 'sun');
         } else {
-            localStorage.setItem('sattva_theme', 'light');
+            localStorage.setItem('zenaura_theme', 'light');
             btnToggleTheme.querySelector('i').setAttribute('data-lucide', 'moon');
         }
         lucide.createIcons();
@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     btnOpenSettings.addEventListener('click', () => {
         settingsModal.classList.remove('hidden');
-        apiKeyInput.value = window.SattvaAI.getApiKey();
+        apiKeyInput.value = window.ZenAuraAI.getApiKey();
     });
     
     function closeModal() {
@@ -520,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     btnSaveSettings.addEventListener('click', () => {
         const key = apiKeyInput.value.trim();
-        window.SattvaAI.saveApiKey(key);
+        window.ZenAuraAI.saveApiKey(key);
         updateApiKeyStatusUI();
         closeModal();
     });
@@ -576,10 +576,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Run analysis using Gemini wrapper
-            const analysis = await window.SattvaAI.analyzeJournalWithAI(text, currentMoodSelection);
+            const analysis = await window.ZenAuraAI.analyzeJournalWithAI(text, currentMoodSelection);
             
             // Save journal in database
-            const journals = JSON.parse(localStorage.getItem('sattva_journals') || '[]');
+            const journals = JSON.parse(localStorage.getItem('zenaura_journals') || '[]');
             const entry = {
                 date: new Date().toLocaleDateString(),
                 mood: analysis.mood || currentMoodSelection,
@@ -590,7 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             
             journals.push(entry);
-            localStorage.setItem('sattva_journals', JSON.stringify(journals));
+            localStorage.setItem('zenaura_journals', JSON.stringify(journals));
             
             // Recalculate streak and stats
             updateStreakAndStats();
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Save/Load message streams
     function loadChatHistory() {
-        const chats = JSON.parse(localStorage.getItem('sattva_chats') || '[]');
+        const chats = JSON.parse(localStorage.getItem('zenaura_chats') || '[]');
         if (chats.length === 0) return;
         
         chatMessagesContainer.innerHTML = '';
@@ -657,13 +657,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function saveMessageToStorage(role, text) {
-        const chats = JSON.parse(localStorage.getItem('sattva_chats') || '[]');
+        const chats = JSON.parse(localStorage.getItem('zenaura_chats') || '[]');
         chats.push({
             role: role,
             text: text,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         });
-        localStorage.setItem('sattva_chats', JSON.stringify(chats));
+        localStorage.setItem('zenaura_chats', JSON.stringify(chats));
     }
 
     function scrollChatToBottom() {
@@ -689,7 +689,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showTypingIndicator() {
         const typingDiv = document.createElement('div');
         typingDiv.className = 'message companion typing-indicator-msg';
-        typingDiv.id = 'sattva-typing-indicator';
+        typingDiv.id = 'zenaura-typing-indicator';
         typingDiv.innerHTML = `
             <div class="typing-dot"></div>
             <div class="typing-dot"></div>
@@ -700,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function removeTypingIndicator() {
-        const indicator = document.getElementById('sattva-typing-indicator');
+        const indicator = document.getElementById('zenaura-typing-indicator');
         if (indicator) indicator.remove();
     }
 
@@ -718,7 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showTypingIndicator();
         
         // 3. Construct history payload for Gemini multi-turn format
-        const chats = JSON.parse(localStorage.getItem('sattva_chats') || '[]');
+        const chats = JSON.parse(localStorage.getItem('zenaura_chats') || '[]');
         // Gemini expects: { role: 'user'|'model', parts: [{ text: string }] }
         // Take last 10 messages for token efficiency and memory retention
         const geminiHistory = chats.slice(-10).map(msg => {
@@ -730,7 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Get response
-            const botResponse = await window.SattvaAI.generateChatResponse(geminiHistory);
+            const botResponse = await window.ZenAuraAI.generateChatResponse(geminiHistory);
             
             // 4. Remove typing loader and present response
             removeTypingIndicator();
@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Clear Chat logs
     btnClearChat.addEventListener('click', () => {
         if (confirm("Are you sure you want to clear your chat history with Aura?")) {
-            localStorage.setItem('sattva_chats', JSON.stringify([]));
+            localStorage.setItem('zenaura_chats', JSON.stringify([]));
             chatMessagesContainer.innerHTML = `
                 <div class="message companion">
                     <div class="msg-bubble">
@@ -1220,9 +1220,9 @@ document.addEventListener('DOMContentLoaded', () => {
         breathingBubble.style.transform = 'scale(1.0)';
         
         // Log mindfulness completion session in storage
-        const count = parseInt(localStorage.getItem('sattva_mindfulness_count') || '0');
+        const count = parseInt(localStorage.getItem('zenaura_mindfulness_count') || '0');
         const newCount = count + 1;
-        localStorage.setItem('sattva_mindfulness_count', newCount.toString());
+        localStorage.setItem('zenaura_mindfulness_count', newCount.toString());
         updateStreakAndStats();
         completeMindfulnessChecklistTask();
     }
@@ -1763,7 +1763,7 @@ document.addEventListener('DOMContentLoaded', () => {
             breathing: false
         };
 
-        const storedChecklist = localStorage.getItem('sattva_self_care_checklist');
+        const storedChecklist = localStorage.getItem('zenaura_self_care_checklist');
         if (storedChecklist) {
             try {
                 const parsed = JSON.parse(storedChecklist);
@@ -1776,7 +1776,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Save current state to localStorage
-        localStorage.setItem('sattva_self_care_checklist', JSON.stringify(checklistState));
+        localStorage.setItem('zenaura_self_care_checklist', JSON.stringify(checklistState));
 
         // Update UI checkboxes
         document.querySelectorAll('.self-care-cb').forEach(cb => {
@@ -1787,7 +1787,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (task !== 'breathing') {
                 cb.addEventListener('change', (e) => {
                     checklistState[task] = cb.checked;
-                    localStorage.setItem('sattva_self_care_checklist', JSON.stringify(checklistState));
+                    localStorage.setItem('zenaura_self_care_checklist', JSON.stringify(checklistState));
                     updateSelfCareProgress(checklistState);
                 });
             }
@@ -1813,12 +1813,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function completeMindfulnessChecklistTask() {
-        const storedChecklist = localStorage.getItem('sattva_self_care_checklist');
+        const storedChecklist = localStorage.getItem('zenaura_self_care_checklist');
         if (storedChecklist) {
             try {
                 const parsed = JSON.parse(storedChecklist);
                 parsed.breathing = true;
-                localStorage.setItem('sattva_self_care_checklist', JSON.stringify(parsed));
+                localStorage.setItem('zenaura_self_care_checklist', JSON.stringify(parsed));
                 
                 const breathingCb = document.getElementById('cb-task-breathing');
                 if (breathingCb) {

@@ -4,7 +4,7 @@ const GEMINI_MODEL = 'gemini-1.5-flash';
 
 // Get stored API key
 function getApiKey() {
-    return localStorage.getItem('sattva_gemini_api_key') || '';
+    return localStorage.getItem('zenaura_gemini_api_key') || '';
 }
 
 // Check if API key exists
@@ -15,12 +15,12 @@ function isApiKeyConfigured() {
 
 // Save API Key
 function saveApiKey(key) {
-    localStorage.setItem('sattva_gemini_api_key', key.trim());
+    localStorage.setItem('zenaura_gemini_api_key', key.trim());
 }
 
 // Clear API Key
 function clearApiKey() {
-    localStorage.removeItem('sattva_gemini_api_key');
+    localStorage.removeItem('zenaura_gemini_api_key');
 }
 
 /**
@@ -37,7 +37,7 @@ async function analyzeJournalWithAI(journalText, selectedMood) {
     
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
     
-    const systemInstruction = `You are Sattva, an empathetic, professional student mental wellness advisor. 
+    const systemInstruction = `You are ZenAura, an empathetic, professional student mental wellness advisor. 
 Analyze the student's journal entry. They are preparing for high-stakes exams (like NEET, JEE, board exams). 
 Evaluate their text and output a JSON object containing:
 1. "mood": A single word summarizing their core emotion (Happy, Calm, Anxious, Sad, Tired, Stressed).
@@ -105,7 +105,7 @@ async function generateChatResponse(chatHistory) {
     
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
     
-    const systemPrompt = `You are Sattva, an empathetic, supportive, and friendly mental wellness companion for students preparing for high-stakes exams. 
+    const systemPrompt = `You are ZenAura, an empathetic, supportive, and friendly mental wellness companion for students preparing for high-stakes exams. 
 You listen attentively, validate their feelings, offer warm encouragement, and help them find calm.
 Do not give medical or clinical advice. Always safely state that you are an AI companion, not a therapist, if they mention self-harm or deep depression.
 Keep your responses warm, conversational, and relatively short (under 4-5 sentences). Focus on exam anxiety, motivation, stress relief, and studying healthily.`;
@@ -206,7 +206,7 @@ function getMockChatResponse(userMessage) {
             // Standard greetings
             const greetings = ["hi", "hello", "hey", "kem cho", "namaste", "good morning", "good afternoon", "good evening"];
             if (greetings.some(g => cleanMsg.startsWith(g) || cleanMsg === g)) {
-                resolve("Hello there! I'm Sattva, your wellness companion. Preparing for competitive exams can be a long and stressful journey, but I'm here to support you. What's on your mind today?");
+                resolve("Hello there! I'm ZenAura, your wellness companion. Preparing for competitive exams can be a long and stressful journey, but I'm here to support you. What's on your mind today?");
                 return;
             }
 
@@ -283,7 +283,7 @@ function getMockChatResponse(userMessage) {
 }
 
 // Export functions to global scope
-window.SattvaAI = {
+window.ZenAuraAI = {
     getApiKey,
     isApiKeyConfigured,
     saveApiKey,

@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sattva — AI Student Mental Wellness Companion</title>
+    <title>ZenAura — AI Student Mental Wellness Companion</title>
     
     <!-- Meta tags for SEO & Hackathon Presentation -->
-    <meta name="description" content="Sattva is an empathetic, AI-powered mental wellness companion helping students manage exam stress, track moods, analyze journaling, and practice mindfulness.">
+    <meta name="description" content="ZenAura is an empathetic, AI-powered mental wellness companion helping students manage exam stress, track moods, analyze journaling, and practice mindfulness.">
     <meta name="keywords" content="student wellness, exam stress, board exams, NEET prep, JEE prep, AI companion, mood tracker, journaling, mindfulness">
     
     <!-- Google Fonts -->
@@ -37,7 +37,7 @@
                         <path class="glow-ring" d="M12 2a10 10 0 1 0 10 10" />
                     </svg>
                 </div>
-                <h1 class="logo-text">Sattva</h1>
+                <h1 class="logo-text">ZenAura</h1>
             </div>
             
             <nav class="sidebar-nav">
@@ -229,7 +229,7 @@
                         <!-- Left Column: Input Form -->
                         <div class="card journal-input-card">
                             <h3 class="card-title">Daily Journal & Stress Analyzer</h3>
-                            <p class="card-subtitle">Share your study struggles, exam fears, mock test feelings, or general anxiety. Sattva uses Gemini to look deeper.</p>
+                            <p class="card-subtitle">Share your study struggles, exam fears, mock test feelings, or general anxiety. ZenAura uses Gemini to look deeper.</p>
                             
                             <form id="journal-form">
                                 <div class="form-group">
@@ -251,7 +251,7 @@
                                 
                                 <button type="submit" class="submit-btn" id="btn-analyze-journal">
                                     <i data-lucide="sparkles"></i>
-                                    <span>Analyze with Sattva AI</span>
+                                    <span>Analyze with ZenAura AI</span>
                                 </button>
                             </form>
                         </div>
@@ -262,13 +262,13 @@
                             <div class="results-empty-state" id="results-empty">
                                 <i data-lucide="heart-handshake" class="empty-icon"></i>
                                 <h4>Ready for Deep Emotional Analysis</h4>
-                                <p>Type your journal entries on the left, select your current mood, and let Sattva AI highlight hidden stress patterns, trigger scores, and offer immediate coping exercises.</p>
+                                <p>Type your journal entries on the left, select your current mood, and let ZenAura AI highlight hidden stress patterns, trigger scores, and offer immediate coping exercises.</p>
                             </div>
                             
                             <!-- Loading State -->
                             <div class="results-loading-state hidden" id="results-loading">
-                                <div class="sattva-pulse-loader"></div>
-                                <p>Sattva is analyzing your words empathetically...</p>
+                                <div class="zenaura-pulse-loader"></div>
+                                <p>ZenAura is analyzing your words empathetically...</p>
                             </div>
                             
                             <!-- Content State -->
@@ -278,7 +278,7 @@
                                         <span class="badge badge-mood" id="res-mood-tag">Anxious</span>
                                         <span class="badge badge-stress" id="res-stress-tag">Stress Index: 75/100</span>
                                     </div>
-                                    <h4 class="results-title">Sattva's Analysis</h4>
+                                    <h4 class="results-title">ZenAura's Analysis</h4>
                                 </div>
                                 
                                 <div class="results-body">
@@ -327,7 +327,7 @@
                                     <span class="online-indicator"></span>
                                 </div>
                                 <div class="chat-companion-details">
-                                    <h4>Sattva Empathetic Companion</h4>
+                                    <h4>ZenAura Empathetic Companion</h4>
                                     <p>Safe, supportive space — feel free to vent anything</p>
                                 </div>
                                 <button class="clear-chat-btn" id="btn-clear-chat" title="Clear Chat">
@@ -339,7 +339,7 @@
                                 <!-- Default Welcome Message -->
                                 <div class="message companion">
                                     <div class="msg-bubble">
-                                        Hi there! I'm Sattva, your wellness companion. Preparing for exams can feel incredibly overwhelming, exhausting, and stressful. I am here to listen, support, and help you find calm. What's on your mind today?
+                                        Hi there! I'm ZenAura, your wellness companion. Preparing for exams can feel incredibly overwhelming, exhausting, and stressful. I am here to listen, support, and help you find calm. What's on your mind today?
                                     </div>
                                     <span class="msg-time">Just now</span>
                                 </div>
@@ -516,7 +516,7 @@
     <div class="modal-backdrop hidden" id="settings-modal">
         <div class="modal card">
             <div class="modal-header">
-                <h3>Configure Sattva AI Assistant</h3>
+                <h3>Configure ZenAura AI Assistant</h3>
                 <button class="close-modal-btn" id="btn-close-settings">
                     <i data-lucide="x"></i>
                 </button>
@@ -524,7 +524,7 @@
             
             <div class="modal-body">
                 <p class="modal-desc">
-                    Sattva uses the official <strong>Google Gemini API</strong> to analyze your journaling patterns and talk with you empathetically. Your API key remains stored securely inside your local browser.
+                    ZenAura uses the official <strong>Google Gemini API</strong> to analyze your journaling patterns and talk with you empathetically. Your API key remains stored securely inside your local browser.
                 </p>
                 
                 <div class="form-group">
